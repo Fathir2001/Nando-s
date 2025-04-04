@@ -1,18 +1,18 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 import Dishes from "./components/Dishes";
-import Reviews from "./components/Review";
 import Review from "./components/Review";
+import Login from "./components/Login";
 
-const App = () => {
+const HomePage = () => {
   return (
-    <div>
+    <>
       <Navbar />
-
       <main>
         <div id="home">
           <Home />
@@ -36,7 +36,18 @@ const App = () => {
       </main>
 
       <Footer />
-    </div>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
   );
 };
 
