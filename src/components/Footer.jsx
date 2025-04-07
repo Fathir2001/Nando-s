@@ -84,13 +84,13 @@ const Footer = () => {
           </nav>
         </div>
       </div>
+      
+      {/* Fixed: Removed the unnecessary nested <p> tags */}
       <div>
-        <p>
-          <p className=" text-center py-4">
-            @copyright developed by
-            <span className=" text-brightColor"> champion programmers</span> |
-            All rights reserved
-          </p>
+        <p className="text-center py-4">
+          @copyright developed by
+          <span className="text-brightColor"> champion programmers</span> |
+          All rights reserved
         </p>
       </div>
     </div>
