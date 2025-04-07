@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
@@ -15,7 +20,8 @@ import OrderDetail from "./components/OrderDetail";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
-
+import Desserts from "./components/Desserts";
+import FreshJuice from "./components/FreshJuice";
 
 const HomePage = () => {
   return (
@@ -30,13 +36,21 @@ const HomePage = () => {
           <Dishes />
         </div>
 
+        <div id="freshjuice">
+          <FreshJuice />
+        </div>
+
+        <div id="desserts">
+          <Desserts />
+        </div>
+
         <div id="about">
           <About />
         </div>
 
-        <div id="menu">
+        {/* <div id="menu">
           <Menu />
-        </div>
+        </div> */}
 
         <div id="review">
           <Review />
