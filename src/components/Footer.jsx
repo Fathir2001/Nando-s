@@ -75,12 +75,12 @@ const Footer = () => {
             >
               +94 757521997
             </a>
-            {/* <a
+            <a
               className=" hover:text-brightColor transition-all cursor-pointer"
               href="/"
             >
               Social media
-            </a> */}
+            </a>
           </nav>
         </div>
       </div>
@@ -89,7 +89,7 @@ const Footer = () => {
       <div>
         <p className="text-center py-4">
           @copyright developed by
-          <span className="text-brightColor"> champion programmers</span> |
+          <span className="text-brightColor"> Rifthan Fathir</span> |
           All rights reserved
         </p>
       </div>
