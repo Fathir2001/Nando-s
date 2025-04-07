@@ -7,10 +7,10 @@ import dish4 from "../assets/img/dish4.jpg";
 import dish5 from "../assets/img/dish5.jpg";
 import dish6 from "../assets/img/dish6.jpg";
 import dish7 from "../assets/img/dish7.jpg";
-import dish8 from "../assets/img/dish8.webp";
+import dish8 from "../assets/img/dish8.jpg";
 import dish9 from "../assets/img/dish9.jpg";
-import dish10 from "../assets/img/dish10.webp";
-import dish11 from "../assets/img/dish11.webp";
+import dish10 from "../assets/img/dish10.jpg";
+import dish11 from "../assets/img/dish11.jpg";
 import dish12 from "../assets/img/dish12.jpeg";
 import DishesCard from "../layouts/DishesCard";
 
