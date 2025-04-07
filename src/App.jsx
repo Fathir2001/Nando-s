@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
@@ -8,6 +8,14 @@ import Footer from "./components/Footer";
 import Dishes from "./components/Dishes";
 import Review from "./components/Review";
 import Login from "./components/Login";
+import Register from "./components/Register";
+import ForgotPassword from "./components/ForgotPassword";
+import Profile from "./components/Profile";
+import OrderDetail from "./components/OrderDetail";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./contexts/AuthContext";
+
 
 const HomePage = () => {
   return (
@@ -40,14 +48,47 @@ const HomePage = () => {
   );
 };
 
+// Protected Route Component
+const ProtectedRouteWrapper = ({ children }) => {
+  return (
+    <ProtectedRoute>
+      <>
+        <Navbar />
+        {children}
+        <Footer />
+      </>
+    </ProtectedRoute>
+  );
+};
+
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRouteWrapper>
+                <Profile />
+              </ProtectedRouteWrapper>
+            }
+          />
+          <Route
+            path="/order/:orderId"
+            element={
+              <ProtectedRouteWrapper>
+                <OrderDetail />
+              </ProtectedRouteWrapper>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 
