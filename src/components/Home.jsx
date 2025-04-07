@@ -9,9 +9,10 @@ const Home = () => {
           Elevate Your Inner Foodie with Every Bite.
         </h1>
         <p className=" text-backgroundColor">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quis et qui,
-          maxime assumenda repellat corrupti officia dolorum delectus labore
-          deleniti?
+          From the moment you step in, our carefully curated ambience will make
+          you feel right at home. Whether you're dining with family, friends, or
+          colleagues, the warm, inviting atmosphere is the perfect backdrop for
+          any occasion
         </p>
         <div className=" lg:pl-44">
           <Button title="Order Now" />
