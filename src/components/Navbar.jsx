@@ -54,68 +54,15 @@ const Navbar = () => {
               Home
             </ScrollLink>
 
-            <div className="relative group">
-              <div className="flex items-center gap-1">
-                <ScrollLink
-                  to="dishes"
-                  spy={true}
-                  smooth={true}
-                  duration={500}
-                  className="hover:text-brightColor transition-all cursor-pointer"
-                >
-                  Dishes
-                </ScrollLink>
-
-                <BiChevronDown className="cursor-pointer" size={25} />
-              </div>
-
-              <ul className="absolute hidden space-y-2 group-hover:block bg-white border border-gray-300 rounded-lg p-5">
-                <li>
-                  <ScrollLink
-                    to="dishes"
-                    spy={true}
-                    smooth={true}
-                    duration={500}
-                    className="text-gray-800 hover:text-brightColor transition-all cursor-pointer"
-                  >
-                    Spicy
-                  </ScrollLink>
-                </li>
-                <li>
-                  <ScrollLink
-                    to="dishes"
-                    spy={true}
-                    smooth={true}
-                    duration={500}
-                    className="text-gray-800 hover:text-brightColor transition-all cursor-pointer"
-                  >
-                    Tasty
-                  </ScrollLink>
-                </li>
-                <li>
-                  <ScrollLink
-                    to="dishes"
-                    spy={true}
-                    smooth={true}
-                    duration={500}
-                    className="text-gray-800 hover:text-brightColor transition-all cursor-pointer"
-                  >
-                    Delicious
-                  </ScrollLink>
-                </li>
-                <li>
-                  <ScrollLink
-                    to="dishes"
-                    spy={true}
-                    smooth={true}
-                    duration={500}
-                    className="text-gray-800 hover:text-brightColor transition-all cursor-pointer"
-                  >
-                    Crispy
-                  </ScrollLink>
-                </li>
-              </ul>
-            </div>
+            <ScrollLink
+              to="dishes"
+              spy={true}
+              smooth={true}
+              duration={500}
+              className="hover:text-brightColor transition-all cursor-pointer"
+            >
+              Dishes
+            </ScrollLink>
 
             <ScrollLink
               to="about"
@@ -127,7 +74,7 @@ const Navbar = () => {
               About
             </ScrollLink>
 
-            <ScrollLink
+            {/* <ScrollLink
               to="menu"
               spy={true}
               smooth={true}
@@ -135,7 +82,7 @@ const Navbar = () => {
               className="hover:text-brightColor transition-all cursor-pointer"
             >
               Menu
-            </ScrollLink>
+            </ScrollLink> */}
 
             <ScrollLink
               to="review"
