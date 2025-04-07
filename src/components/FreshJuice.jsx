@@ -6,6 +6,8 @@ import juice3 from "../assets/img/juice3.jpg";
 import juice4 from "../assets/img/juice4.jpg";
 import juice5 from "../assets/img/juice5.jpg";
 import juice6 from "../assets/img/juice6.jpg";
+import juice7 from "../assets/img/juice7.jpg";
+import juice8 from "../assets/img/juice8.jpg";
 import DishesCard from "../layouts/DishesCard";
 
 const FreshJuice = () => {
@@ -16,12 +18,14 @@ const FreshJuice = () => {
       </h1>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        <DishesCard img={juice1} title="Orange Juice" price="$4.99" />
-        <DishesCard img={juice2} title="Strawberry Smoothie" price="$5.99" />
-        <DishesCard img={juice3} title="Mango Paradise" price="$5.49" />
-        <DishesCard img={juice4} title="Berry Blast" price="$5.99" />
-        <DishesCard img={juice5} title="Green Detox" price="$6.99" />
-        <DishesCard img={juice6} title="Tropical Punch" price="$5.49" />
+        <DishesCard img={juice1} title="Orange" price="530 LKR" />
+        <DishesCard img={juice2} title="Mango" price="390 LKR" />
+        <DishesCard img={juice3} title="Lime with Mint" price="450 LKR" />
+        <DishesCard img={juice4} title="Watermelon" price="340 LKR" />
+        <DishesCard img={juice5} title="Lime" price="320 LKR" />
+        <DishesCard img={juice6} title="Mixed Fruit" price="450 LKR" />
+        <DishesCard img={juice7} title="Avacado" price="380 LKR" />
+        <DishesCard img={juice8} title="Papaya" price="380 LKR" />
       </div>
     </div>
   );
