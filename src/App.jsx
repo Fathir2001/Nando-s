@@ -22,6 +22,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
 import Desserts from "./components/Desserts";
 import FreshJuice from "./components/FreshJuice";
+import Shakes from "./components/Shakes";
 
 const HomePage = () => {
   return (
@@ -38,6 +39,10 @@ const HomePage = () => {
 
         <div id="freshjuice">
           <FreshJuice />
+        </div>
+
+        <div id="shakes">
+          <Shakes />
         </div>
 
         <div id="desserts">
