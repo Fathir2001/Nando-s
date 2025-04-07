@@ -12,7 +12,7 @@ const About = () => {
           Why Choose Us?
         </h1>
         <p>
-          At [Restaurant Name], we believe dining is not just about eating, it's
+          At NANDO'S, we believe dining is not just about eating, it's
           about experiencing the perfect blend of taste, ambience, and service.
           Whether you're here for a romantic evening, a family gathering, or a
           corporate event, we strive to provide you with an unforgettable
