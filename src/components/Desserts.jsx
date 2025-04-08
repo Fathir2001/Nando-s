@@ -7,8 +7,8 @@ import DishesCard from "../layouts/DishesCard";
 
 const Desserts = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center lg:px-32 px-5">
-      <h1 className="text-4xl font-semibold text-center pt-24 pb-10">
+    <div className="min-h-screen py-16 flex flex-col justify-center items-center px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
+      <h1 className="text-3xl md:text-4xl font-semibold text-center pt-16 md:pt-24 pb-8 md:pb-10">
         Desserts
       </h1>
 

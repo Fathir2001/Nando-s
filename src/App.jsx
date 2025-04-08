@@ -3,12 +3,10 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
-import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 import Dishes from "./components/Dishes";
 import Review from "./components/Review";
@@ -19,7 +17,6 @@ import Profile from "./components/Profile";
 import OrderDetail from "./components/OrderDetail";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./contexts/AuthContext";
 import Desserts from "./components/Desserts";
 import FreshJuice from "./components/FreshJuice";
 import Shakes from "./components/Shakes";
@@ -28,38 +25,34 @@ const HomePage = () => {
   return (
     <>
       <Navbar />
-      <main>
-        <div id="home">
+      <main className="flex flex-col w-full overflow-x-hidden">
+        <section id="home">
           <Home />
-        </div>
+        </section>
 
-        <div id="dishes">
+        <section id="dishes">
           <Dishes />
-        </div>
+        </section>
 
-        <div id="freshjuice">
+        <section id="freshjuice">
           <FreshJuice />
-        </div>
+        </section>
 
-        <div id="shakes">
+        <section id="shakes">
           <Shakes />
-        </div>
+        </section>
 
-        <div id="desserts">
+        <section id="desserts">
           <Desserts />
-        </div>
+        </section>
 
-        <div id="about">
+        <section id="about">
           <About />
-        </div>
+        </section>
 
-        {/* <div id="menu">
-          <Menu />
-        </div> */}
-
-        <div id="review">
+        <section id="review">
           <Review />
-        </div>
+        </section>
       </main>
 
       <Footer />
@@ -73,7 +66,7 @@ const ProtectedRouteWrapper = ({ children }) => {
     <ProtectedRoute>
       <>
         <Navbar />
-        {children}
+        <main className="pt-20">{children}</main>
         <Footer />
       </>
     </ProtectedRoute>

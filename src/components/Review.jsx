@@ -24,11 +24,11 @@ const Review = () => {
   ];
 
   return (
-    <div className=" min-h-screen flex flex-col items-center justify-center md:px-32 px-5">
-      <h1 className=" text-4xl font-semibold text-center lg:pt-16 pt-24 pb-10">
+    <div className="min-h-screen py-16 flex flex-col items-center justify-center px-4 sm:px-8 md:px-16 lg:px-32">
+      <h1 className="text-3xl md:text-4xl font-semibold text-center pt-16 md:pt-8 pb-10">
         Customer's Review
       </h1>
-      <div className=" flex flex-col md:flex-row gap-5 mt-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
         {reviews.map((review, index) => (
           <ReviewCard 
             key={index}

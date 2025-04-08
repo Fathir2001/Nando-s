@@ -13,6 +13,7 @@ const Navbar = () => {
   const [menu, setMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const menuDropdownRef = useRef(null);
@@ -24,6 +25,7 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setMenu(false);
+    setShowMenuDropdown(false);
   };
   
   const handleLogout = async () => {
@@ -43,6 +45,22 @@ const Navbar = () => {
     setShowUserMenu(!showUserMenu);
   };
 
+  // Add scroll effect to navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -61,17 +79,17 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="fixed w-full z-50">
+    <div className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : ''}`}>
       <div>
-        <div className="flex flex-row justify-between p-5 md:px-32 px-5 bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
+        <div className={`flex flex-row justify-between p-4 md:p-5 md:px-16 lg:px-32 ${!scrolled ? 'bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]' : ''}`}>
           <div className="flex flex-row items-center cursor-pointer">
             <span>
-              <BiRestaurant size={45} className="text-brightColor" />
+              <BiRestaurant size={40} className="text-brightColor" />
             </span>
-            <h1 className="text-xl font-semibold">NANDO&#39;S</h1>
+            <h1 className="text-lg md:text-xl font-semibold">NANDO&#39;S</h1>
           </div>
 
-          <nav className="hidden md:flex flex-row items-center text-lg font-medium gap-8">
+          <nav className="hidden md:flex flex-row items-center text-base lg:text-lg font-medium gap-4 lg:gap-8">
             <ScrollLink
               to="home"
               spy={true}
@@ -88,7 +106,7 @@ const Navbar = () => {
                 onClick={toggleMenuDropdown}
               >
                 <span>Menu</span>
-                <BiChevronDown size={20} />
+                <BiChevronDown size={20} className={`transform transition-transform ${showMenuDropdown ? 'rotate-180' : ''}`} />
               </div>
               {showMenuDropdown && (
                 <ul 
@@ -172,8 +190,8 @@ const Navbar = () => {
                   className="flex items-center gap-2 cursor-pointer hover:text-brightColor"
                   onClick={toggleUserMenu}
                 >
-                  <BiUserCircle size={30} className="text-brightColor" />
-                  <span>{currentUser.displayName || "User"}</span>
+                  <BiUserCircle size={28} className="text-brightColor" />
+                  <span className="hidden lg:inline">{currentUser.displayName || "User"}</span>
                   <BiChevronDown className="cursor-pointer" size={20} />
                 </div>
                 {showUserMenu && (
@@ -202,16 +220,16 @@ const Navbar = () => {
 
           <div className="md:hidden flex items-center">
             {menu ? (
-              <AiOutlineClose size={25} onClick={handleChange} />
+              <AiOutlineClose size={25} onClick={handleChange} className="cursor-pointer" />
             ) : (
-              <AiOutlineMenuUnfold size={25} onClick={handleChange} />
+              <AiOutlineMenuUnfold size={25} onClick={handleChange} className="cursor-pointer" />
             )}
           </div>
         </div>
         <div
-          className={` ${
+          className={`${
             menu ? "translate-x-0" : "-translate-x-full"
-          } lg:hidden flex flex-col absolute bg-black text-white left-0 top-20 font-semibold text-2xl text-center pt-8 pb-4 gap-8 w-full h-fit transition-transform duration-300 z-50`}
+          } lg:hidden flex flex-col fixed bg-black text-white left-0 top-[64px] font-semibold text-xl text-center pt-6 pb-4 gap-6 w-full h-[calc(100vh-64px)] overflow-auto transition-transform duration-300 z-50`}
         >
           <ScrollLink
             to="home"
@@ -226,13 +244,13 @@ const Navbar = () => {
           
           <div className="relative">
             <div 
-              className="hover:text-brightColor transition-all cursor-pointer"
+              className="hover:text-brightColor transition-all cursor-pointer flex items-center justify-center"
               onClick={() => setShowMenuDropdown(!showMenuDropdown)}
             >
-              Menu <BiChevronDown className="inline" />
+              Menu <BiChevronDown className={`inline ml-1 transform transition-transform ${showMenuDropdown ? 'rotate-180' : ''}`} />
             </div>
             {showMenuDropdown && (
-              <div className="flex flex-col gap-2 mt-2 text-lg bg-gray-900 py-2 rounded-md">
+              <div className="flex flex-col gap-2 mt-2 text-base bg-gray-900 py-2 rounded-md mx-8">
                 <ScrollLink
                   to="dishes"
                   spy={true}
@@ -304,18 +322,24 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 className="hover:text-brightColor transition-all cursor-pointer"
+                onClick={closeMenu}
               >
                 Profile
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={() => {
+                  handleLogout();
+                  closeMenu();
+                }}
                 className="px-6 py-2 border-2 border-brightColor text-brightColor hover:bg-brightColor hover:text-white transition-all rounded-full mx-auto"
               >
                 Sign Out
               </button>
             </>
           ) : (
-            <Button title="Login" to="/login" />
+            <div onClick={closeMenu}>
+              <Button title="Login" to="/login" />
+            </div>
           )}
         </div>
       </div>
