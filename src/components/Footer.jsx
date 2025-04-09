@@ -15,7 +15,7 @@ const Footer = () => {
             culinary excellence.
           </p>
         </div>
-        
+
         <div>
           <h1 className="font-medium text-xl pb-4">Links</h1>
           <nav className="flex flex-col gap-2">
@@ -48,7 +48,7 @@ const Footer = () => {
             </ScrollLink>
           </nav>
         </div>
-        
+
         <div>
           <h1 className="font-medium text-xl pb-4">Menu</h1>
           <nav className="flex flex-col gap-2">
@@ -90,7 +90,7 @@ const Footer = () => {
             </ScrollLink>
           </nav>
         </div>
-        
+
         <div>
           <h1 className="font-medium text-xl pb-4">Contact Us</h1>
           <nav className="flex flex-col gap-2">
@@ -107,25 +107,54 @@ const Footer = () => {
               +94 757521997
             </a>
             <div className="flex gap-3 mt-2">
-              <a href="https://www.facebook.com/profile.php?id=61573905344080" target="_blank" rel="noopener noreferrer">
-                <BsFacebook size={20} className="hover:text-brightColor transition-all" />
+              <a
+                href="https://www.facebook.com/profile.php?id=61573905344080"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <BsFacebook
+                  size={20}
+                  className="hover:text-brightColor transition-all"
+                />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <RiTwitterXFill size={20} className="hover:text-brightColor transition-all" />
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <RiTwitterXFill
+                  size={20}
+                  className="hover:text-brightColor transition-all"
+                />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <BsInstagram size={20} className="hover:text-brightColor transition-all" />
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <BsInstagram
+                  size={20}
+                  className="hover:text-brightColor transition-all"
+                />
               </a>
             </div>
           </nav>
         </div>
       </div>
-      
+
       <div className="border-t border-gray-800">
         <p className="text-center py-4 px-4 text-sm">
           @copyright developed by
-          <span className="text-brightColor"> Rifthan Fathir</span> |
-          All rights reserved
+          <a
+            href="https://fathir2001.github.io/Portfolio/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brightColor hover:text-orange-400 transition-all"
+          >
+            {" "}
+            Rifthan Fathir
+          </a>{" "}
+          | All rights reserved
         </p>
       </div>
     </footer>
