@@ -95,7 +95,6 @@ const App = () => {
               </ProtectedRouteWrapper>
             }
           />
-          {/* New route for cart page */}
           <Route
             path="/cart"
             element={
