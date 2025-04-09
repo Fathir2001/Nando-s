@@ -17,7 +17,7 @@ const FreshJuice = () => {
         Fresh Juices
       </h1>
 
-      <div className="flex flex-wrap gap-8 justify-center">
+      <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
         <DishesCard img={juice1} title="Orange" price="530 LKR" />
         <DishesCard img={juice2} title="Mango" price="390 LKR" />
         <DishesCard img={juice3} title="Lime with Mint" price="450 LKR" />

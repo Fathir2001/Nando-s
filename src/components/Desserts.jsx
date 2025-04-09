@@ -12,7 +12,7 @@ const Desserts = () => {
         Desserts
       </h1>
 
-      <div className="flex flex-wrap gap-8 justify-center">
+      <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
         <DishesCard img={dessert1} title="Fruit Salad" price="420 LKR" />
         <DishesCard img={dessert2} title="Wattalappam" price="150 LKR" />
         <DishesCard img={dessert3} title="Ice Cream" price="300 LKR" />

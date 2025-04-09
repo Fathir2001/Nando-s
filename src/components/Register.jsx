@@ -64,7 +64,7 @@ const Register = () => {
       
       try {
         await register(formData.fullName, formData.email, formData.password);
-        navigate("/"); // Redirect to home after successful registration
+        navigate("/login"); // Redirect to home after successful registration
       } catch (error) {
         console.error("Registration error:", error);
         

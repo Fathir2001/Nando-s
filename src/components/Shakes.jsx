@@ -18,7 +18,7 @@ const Shakes = () => {
         Milkshakes
       </h1>
 
-      <div className="flex flex-wrap gap-8 justify-center">
+      <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
         <DishesCard img={shake1} title="Mango Milkshake" price="520 LKR" />
         <DishesCard img={shake2} title="Lassie Salt & Sweet" price="420 LKR" />
         <DishesCard img={shake3} title="Mango Lassi" price="520 LKR" />
