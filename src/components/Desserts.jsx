@@ -1,9 +1,13 @@
-// eslint-disable-next-line no-unused-vars
 import React from "react";
-import dessert1 from "../assets/img/dessert1.jpg";
-import dessert2 from "../assets/img/dessert2.jpg";
-import dessert3 from "../assets/img/dessert3.jpg";
+import { getImageUrl } from "../utils/imageUtils";
 import DishesCard from "../layouts/DishesCard";
+
+// Create dessert data objects with proper image references
+const dessertData = [
+  { id: 1, img: "dessert1.jpg", title: "Fruit Salad", price: "LKR 420" },
+  { id: 2, img: "dessert2.jpg", title: "Wattalappam", price: "LKR 150" },
+  { id: 3, img: "dessert3.jpg", title: "Ice Cream", price: "LKR 300" },
+];
 
 const Desserts = () => {
   return (
@@ -13,9 +17,14 @@ const Desserts = () => {
       </h1>
 
       <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
-        <DishesCard img={dessert1} title="Fruit Salad" price="420 LKR" />
-        <DishesCard img={dessert2} title="Wattalappam" price="150 LKR" />
-        <DishesCard img={dessert3} title="Ice Cream" price="300 LKR" />
+        {dessertData.map((dessert) => (
+          <DishesCard 
+            key={dessert.id}
+            img={getImageUrl(dessert.img)} 
+            title={dessert.title} 
+            price={dessert.price} 
+          />
+        ))}
       </div>
     </div>
   );

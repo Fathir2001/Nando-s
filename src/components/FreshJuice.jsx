@@ -1,14 +1,18 @@
-// eslint-disable-next-line no-unused-vars
 import React from "react";
-import juice1 from "../assets/img/juice1.jpg";
-import juice2 from "../assets/img/juice2.jpg";
-import juice3 from "../assets/img/juice3.jpg";
-import juice4 from "../assets/img/juice4.jpg";
-import juice5 from "../assets/img/juice5.jpg";
-import juice6 from "../assets/img/juice6.jpg";
-import juice7 from "../assets/img/juice7.jpg";
-import juice8 from "../assets/img/juice8.jpg";
+import { getImageUrl } from "../utils/imageUtils";
 import DishesCard from "../layouts/DishesCard";
+
+// Create juice data objects with proper image references
+const juiceData = [
+  { id: 1, img: "juice1.jpg", title: "Orange", price: "LKR 530" },
+  { id: 2, img: "juice2.jpg", title: "Mango", price: "LKR 390" },
+  { id: 3, img: "juice3.jpg", title: "Lime with Mint", price: "LKR 450" },
+  { id: 4, img: "juice4.jpg", title: "Watermelon", price: "LKR 340" },
+  { id: 5, img: "juice5.jpg", title: "Lime", price: "LKR 320" },
+  { id: 6, img: "juice6.jpg", title: "Mixed Fruit", price: "LKR 450" },
+  { id: 7, img: "juice7.jpg", title: "Avacado", price: "LKR 380" },
+  { id: 8, img: "juice8.jpg", title: "Papaya", price: "LKR 380" },
+];
 
 const FreshJuice = () => {
   return (
@@ -18,14 +22,14 @@ const FreshJuice = () => {
       </h1>
 
       <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
-        <DishesCard img={juice1} title="Orange" price="530 LKR" />
-        <DishesCard img={juice2} title="Mango" price="390 LKR" />
-        <DishesCard img={juice3} title="Lime with Mint" price="450 LKR" />
-        <DishesCard img={juice4} title="Watermelon" price="340 LKR" />
-        <DishesCard img={juice5} title="Lime" price="320 LKR" />
-        <DishesCard img={juice6} title="Mixed Fruit" price="450 LKR" />
-        <DishesCard img={juice7} title="Avacado" price="380 LKR" />
-        <DishesCard img={juice8} title="Papaya" price="380 LKR" />
+        {juiceData.map((juice) => (
+          <DishesCard 
+            key={juice.id}
+            img={getImageUrl(juice.img)} 
+            title={juice.title} 
+            price={juice.price} 
+          />
+        ))}
       </div>
     </div>
   );

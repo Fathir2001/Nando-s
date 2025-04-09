@@ -1,15 +1,18 @@
-// eslint-disable-next-line no-unused-vars
 import React from "react";
-import shake1 from "../assets/img/shake1.webp";
-import shake2 from "../assets/img/shake2.jpg";
-import shake3 from "../assets/img/shake3.jpg";
-import shake4 from "../assets/img/shake4.jpg";
-import shake5 from "../assets/img/shake5.jpg";
-import shake6 from "../assets/img/shake6.jpg";
-import shake7 from "../assets/img/shake7.jpg";
-import shake8 from "../assets/img/shake8.webp";
-
+import { getImageUrl } from "../utils/imageUtils";
 import DishesCard from "../layouts/DishesCard";
+
+// Create shake data objects with proper image references
+const shakeData = [
+  { id: 1, img: "shake1.webp", title: "Mango Milkshake", price: "LKR 520" },
+  { id: 2, img: "shake2.jpg", title: "Lassie Salt & Sweet", price: "LKR 420" },
+  { id: 3, img: "shake3.jpg", title: "Mango Lassi", price: "LKR 520" },
+  { id: 4, img: "shake4.jpg", title: "Ice Coffee", price: "LKR 490" },
+  { id: 5, img: "shake5.jpg", title: "Faluda", price: "LKR 430" },
+  { id: 6, img: "shake6.jpg", title: "Ice Milo", price: "LKR 450" },
+  { id: 7, img: "shake7.jpg", title: "Badam Milkshake", price: "LKR 520" },
+  { id: 8, img: "shake8.webp", title: "Sweet Lassi", price: "LKR 450" },
+];
 
 const Shakes = () => {
   return (
@@ -19,14 +22,14 @@ const Shakes = () => {
       </h1>
 
       <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
-        <DishesCard img={shake1} title="Mango Milkshake" price="520 LKR" />
-        <DishesCard img={shake2} title="Lassie Salt & Sweet" price="420 LKR" />
-        <DishesCard img={shake3} title="Mango Lassi" price="520 LKR" />
-        <DishesCard img={shake4} title="Ice Coffee" price="490 LKR" />
-        <DishesCard img={shake5} title="Faluda" price="430 LKR" />
-        <DishesCard img={shake6} title="Ice Milo" price="450 LKR" />
-        <DishesCard img={shake7} title="Badam Milkshake" price="520 LKR" />
-        <DishesCard img={shake8} title="Sweet Lassi" price="450 LKR" />
+        {shakeData.map((shake) => (
+          <DishesCard 
+            key={shake.id}
+            img={getImageUrl(shake.img)} 
+            title={shake.title} 
+            price={shake.price} 
+          />
+        ))}
       </div>
     </div>
   );
