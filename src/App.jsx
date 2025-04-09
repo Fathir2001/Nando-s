@@ -98,7 +98,7 @@ const App = () => {
           <Route
             path="/cart"
             element={
-              <ProtectedRouteWrapper showNavbar={true}>
+              <ProtectedRouteWrapper showNavbar={false}>
                 <AddToCart />
               </ProtectedRouteWrapper>
             }
