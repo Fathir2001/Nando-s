@@ -55,7 +55,7 @@ const Home = () => {
 
       {/* Scroll Down Indicator */}
       <motion.div
-        className="absolute bottom-13 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center"
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
