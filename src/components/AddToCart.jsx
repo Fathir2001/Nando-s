@@ -14,7 +14,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getImageUrl } from "../utils/imageUtils";
 
@@ -271,7 +270,6 @@ const AddToCart = () => {
           )}
         </motion.div>
       </div>
-      <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
   );
 };
