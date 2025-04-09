@@ -60,7 +60,7 @@ const Home = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
       >
-        <p className="text-white md:text-backgroundColor text-sm font-medium mb-2">
+        <p className="text-white md:text-backgroundColor text-sm font-medium mb-4">
           Scroll Down
         </p>
         <motion.div
