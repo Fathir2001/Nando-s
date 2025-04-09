@@ -7,13 +7,17 @@ import Button from "../layouts/Button";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { BiChevronDown, BiUserCircle } from "react-icons/bi";
 import { AiOutlineClose } from "react-icons/ai";
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const Navbar = () => {
   const [menu, setMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const menuDropdownRef = useRef(null);
@@ -31,7 +35,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Failed to log out", error);
     }
@@ -60,6 +64,33 @@ const Navbar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Fetch cart count
+  useEffect(() => {
+    const getCartCount = async () => {
+      if (!currentUser) {
+        setCartCount(0);
+        return;
+      }
+      
+      try {
+        const cartRef = collection(db, "cart");
+        const q = query(cartRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        // Sum up quantities of all items
+        const totalItems = querySnapshot.docs.reduce((count, doc) => {
+          return count + doc.data().quantity;
+        }, 0);
+        
+        setCartCount(totalItems);
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
+      }
+    };
+    
+    getCartCount();
+  }, [currentUser]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -185,33 +216,49 @@ const Navbar = () => {
             </ScrollLink>
 
             {currentUser ? (
-              <div className="relative" ref={userMenuRef}>
-                <div 
-                  className="flex items-center gap-2 cursor-pointer hover:text-brightColor"
-                  onClick={toggleUserMenu}
+              <div className="flex items-center gap-4">
+                {/* Cart Icon for logged-in users */}
+                <Link 
+                  to="/cart" 
+                  className="relative hover:text-brightColor transition-all"
+                  title="View Cart"
                 >
-                  <BiUserCircle size={28} className="text-brightColor" />
-                  <span className="hidden lg:inline">{currentUser.displayName || "User"}</span>
-                  <BiChevronDown className="cursor-pointer" size={20} />
+                  <FaShoppingCart size={22} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                
+                <div className="relative" ref={userMenuRef}>
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer hover:text-brightColor"
+                    onClick={toggleUserMenu}
+                  >
+                    <BiUserCircle size={28} className="text-brightColor" />
+                    <span className="hidden lg:inline">{currentUser.displayName || "User"}</span>
+                    <BiChevronDown className="cursor-pointer" size={20} />
+                  </div>
+                  {showUserMenu && (
+                    <ul className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg p-2 shadow-lg z-50">
+                      <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
+                        <Link to="/profile" className="block">Profile</Link>
+                      </li>
+                      <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
+                        <Link to="/orders" className="block">My Orders</Link>
+                      </li>
+                      <li className="py-2 px-4 hover:bg-gray-100 rounded-md border-t border-gray-200 mt-1 pt-3">
+                        <button 
+                          onClick={handleLogout}
+                          className="w-full text-left text-red-500"
+                        >
+                          Sign out
+                        </button>
+                      </li>
+                    </ul>
+                  )}
                 </div>
-                {showUserMenu && (
-                  <ul className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg p-2 shadow-lg z-50">
-                    <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
-                      <Link to="/profile" className="block">Profile</Link>
-                    </li>
-                    <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
-                      <Link to="/orders" className="block">My Orders</Link>
-                    </li>
-                    <li className="py-2 px-4 hover:bg-gray-100 rounded-md border-t border-gray-200 mt-1 pt-3">
-                      <button 
-                        onClick={handleLogout}
-                        className="w-full text-left text-red-500"
-                      >
-                        Sign out
-                      </button>
-                    </li>
-                  </ul>
-                )}
               </div>
             ) : (
               <Button title="Login" to="/login" />
@@ -219,6 +266,21 @@ const Navbar = () => {
           </nav>
 
           <div className="md:hidden flex items-center">
+            {currentUser && (
+              <Link 
+                to="/cart" 
+                className="relative mr-4 hover:text-brightColor transition-all"
+                title="View Cart"
+              >
+                <FaShoppingCart size={22} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            
             {menu ? (
               <AiOutlineClose size={25} onClick={handleChange} className="cursor-pointer" />
             ) : (
@@ -319,6 +381,13 @@ const Navbar = () => {
 
           {currentUser ? (
             <>
+              <Link
+                to="/cart"
+                className="hover:text-brightColor transition-all cursor-pointer flex items-center justify-center gap-2"
+                onClick={closeMenu}
+              >
+                <FaShoppingCart /> Cart {cartCount > 0 && `(${cartCount})`}
+              </Link>
               <Link
                 to="/profile"
                 className="hover:text-brightColor transition-all cursor-pointer"
