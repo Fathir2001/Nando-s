@@ -57,13 +57,13 @@ const HomePage = () => {
   );
 };
 
-// Protected Route Component
+// Protected Route Component - Modified to NOT include the Navbar
 const ProtectedRouteWrapper = ({ children }) => {
   return (
     <ProtectedRoute>
       <>
-        <Navbar />
-        <main className="pt-20">{children}</main>
+        {/* Removed Navbar from here */}
+        <main>{children}</main>
         <Footer />
       </>
     </ProtectedRoute>
