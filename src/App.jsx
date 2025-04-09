@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
@@ -24,10 +24,10 @@ import { FaLock, FaInfoCircle } from "react-icons/fa";
 // Login Notification Component
 const LoginNotification = () => {
   const { currentUser } = useAuth();
-  
+
   // Don't show the notification for logged-in users
   if (currentUser) return null;
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -41,8 +41,15 @@ const LoginNotification = () => {
         </div>
         <div className="ml-3">
           <p className="text-lg text-amber-800">
-            <FaLock className="inline-block mr-1 text-base" /> 
-            Please <a href="/login" className="font-medium underline text-brightColor hover:text-orange-600">login</a> to order items from our menu.
+            <FaLock className="inline-block mr-1 text-base" />
+            Please{" "}
+            <Link
+              to="/login"
+              className="font-medium underline text-brightColor hover:text-orange-600"
+            >
+              login
+            </Link>{" "}
+            to order items from our menu.
           </p>
         </div>
       </div>
@@ -58,7 +65,7 @@ const HomePage = () => {
         <section id="home">
           <Home />
         </section>
-        
+
         {/* Login Notification Banner */}
         <div className="bg-white py-10">
           <LoginNotification />
