@@ -40,8 +40,8 @@ const LoginNotification = () => {
           <FaInfoCircle className="h-5 w-5 text-brightColor" />
         </div>
         <div className="ml-3">
-          <p className="text-sm text-amber-800">
-            <FaLock className="inline-block mr-1 text-xs" /> 
+          <p className="text-lg text-amber-800">
+            <FaLock className="inline-block mr-1 text-base" /> 
             Please <a href="/login" className="font-medium underline text-brightColor hover:text-orange-600">login</a> to order items from our menu.
           </p>
         </div>

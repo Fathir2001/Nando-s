@@ -46,7 +46,7 @@ const DishesCard = (props) => {
       if (querySnapshot.empty) {
         // Store a clean reference to the image
         const imageReference = getStorableImageName(props.img);
-        
+
         // Item is not in cart, add new item
         const itemData = {
           userId: currentUser.uid,
@@ -130,14 +130,21 @@ const DishesCard = (props) => {
               )}
             </button>
           ) : (
-            <button
-              disabled
-              className="p-2 text-white bg-gray-400 rounded-full cursor-not-allowed opacity-60"
-              title="Login required to add items"
-              aria-label="Login required"
-            >
-              <FaLock size={16} />
-            </button>
+            <div className="relative group">
+              <button
+                disabled
+                className="p-2 text-white bg-gray-400 rounded-full cursor-not-allowed opacity-60"
+                aria-label="Login required"
+              >
+                <FaLock size={16} />
+              </button>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded shadow-lg whitespace-nowrap font-medium">
+                  Please login to add items to cart
+                </div>
+                <div className="w-3 h-3 bg-gray-800 transform rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+              </div>
+            </div>
           )}
         </div>
       </div>
