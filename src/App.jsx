@@ -57,12 +57,12 @@ const HomePage = () => {
   );
 };
 
-// Protected Route Component - Modified to NOT include the Navbar
-const ProtectedRouteWrapper = ({ children }) => {
+// Protected Route Component
+const ProtectedRouteWrapper = ({ children, showNavbar = false }) => {
   return (
     <ProtectedRoute>
       <>
-        {/* Removed Navbar from here */}
+        {showNavbar && <Navbar />}
         <main>{children}</main>
         <Footer />
       </>
@@ -88,7 +88,7 @@ const App = () => {
             }
           />
           <Route
-            path="/order/:orderId"
+            path="/orders"
             element={
               <ProtectedRouteWrapper>
                 <OrderDetail />
@@ -98,7 +98,7 @@ const App = () => {
           <Route
             path="/cart"
             element={
-              <ProtectedRouteWrapper>
+              <ProtectedRouteWrapper showNavbar={true}>
                 <AddToCart />
               </ProtectedRouteWrapper>
             }

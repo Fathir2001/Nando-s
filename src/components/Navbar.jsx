@@ -7,14 +7,17 @@ import Button from "../layouts/Button";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { BiChevronDown, BiUserCircle } from "react-icons/bi";
 import { AiOutlineClose } from "react-icons/ai";
-import { FaShoppingCart } from "react-icons/fa"; // Import cart icon
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const Navbar = () => {
   const [menu, setMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const menuDropdownRef = useRef(null);
@@ -61,6 +64,33 @@ const Navbar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Fetch cart count
+  useEffect(() => {
+    const getCartCount = async () => {
+      if (!currentUser) {
+        setCartCount(0);
+        return;
+      }
+      
+      try {
+        const cartRef = collection(db, "cart");
+        const q = query(cartRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        // Sum up quantities of all items
+        const totalItems = querySnapshot.docs.reduce((count, doc) => {
+          return count + doc.data().quantity;
+        }, 0);
+        
+        setCartCount(totalItems);
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
+      }
+    };
+    
+    getCartCount();
+  }, [currentUser]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -194,9 +224,11 @@ const Navbar = () => {
                   title="View Cart"
                 >
                   <FaShoppingCart size={22} />
-                  <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    2
-                  </span>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
                 
                 <div className="relative" ref={userMenuRef}>
@@ -241,9 +273,11 @@ const Navbar = () => {
                 title="View Cart"
               >
                 <FaShoppingCart size={22} />
-                <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  2
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-brightColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
             )}
             
@@ -352,7 +386,7 @@ const Navbar = () => {
                 className="hover:text-brightColor transition-all cursor-pointer flex items-center justify-center gap-2"
                 onClick={closeMenu}
               >
-                <FaShoppingCart /> Cart
+                <FaShoppingCart /> Cart {cartCount > 0 && `(${cartCount})`}
               </Link>
               <Link
                 to="/profile"

@@ -4,19 +4,45 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaTrash } from "react-icons/fa";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
 import { useAuth } from "../contexts/AuthContext";
+import { collection, query, where, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddToCart = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   
-  // Mock cart data - in a real app, this would come from a context/state manager
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "BBQ Chicken", price: 700, quantity: 1, image: "/src/assets/img/dish1.jpg" },
-    { id: 2, name: "Chicken Submarine", price: 650, quantity: 2, image: "/src/assets/img/dish2.jpg" }
-  ]);
-  
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(150);
+  
+  // Fetch cart items from Firestore
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      if (!currentUser) return;
+      
+      try {
+        const cartRef = collection(db, "cart");
+        const q = query(cartRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        const items = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        setCartItems(items);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+        setLoading(false);
+      }
+    };
+    
+    fetchCartItems();
+  }, [currentUser]);
   
   // Calculate subtotal whenever cart items change
   useEffect(() => {
@@ -25,26 +51,50 @@ const AddToCart = () => {
   }, [cartItems]);
 
   // Remove item from cart
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+  const removeItem = async (id) => {
+    try {
+      await deleteDoc(doc(db, "cart", id));
+      setCartItems(cartItems.filter(item => item.id !== id));
+      toast.success("Item removed from cart");
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item");
+    }
   };
 
   // Update quantity
-  const updateQuantity = (id, newQuantity) => {
+  const updateQuantity = async (id, newQuantity) => {
     if (newQuantity < 1) return;
     
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
+    try {
+      await updateDoc(doc(db, "cart", id), {
+        quantity: newQuantity
+      });
+      
+      setCartItems(cartItems.map(item => 
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      ));
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      toast.error("Failed to update quantity");
+    }
   };
 
   // Calculate total
   const total = subtotal + deliveryFee;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-10 pb-12 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brightColor"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-10 pb-12"> {/* Changed pt-24 to pt-16 */}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-10 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-4"> {/* Changed mb-6 to mb-4 */}
+        <div className="mb-4">
           <button
             onClick={() => navigate("/")}
             className="inline-flex items-center text-gray-600 hover:text-brightColor"
@@ -87,7 +137,7 @@ const AddToCart = () => {
                       <div className="aspect-[4/3] overflow-hidden rounded-xl">
                         <img 
                           src={item.image} 
-                          alt={item.name}
+                          alt={item.itemName}
                           className="w-full h-full object-cover rounded-xl"
                           onError={(e) => {
                             e.target.src = "https://via.placeholder.com/100?text=Nando's";
@@ -97,7 +147,15 @@ const AddToCart = () => {
                       </div>
                       
                       <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4">
-                        <h3 className="font-semibold text-center text-lg sm:text-xl truncate">{item.name}</h3>
+                        <h3 className="font-semibold text-center text-lg sm:text-xl truncate">{item.itemName}</h3>
+                        
+                        <div className="flex flex-row justify-center">
+                          <BsStarFill className="text-brightColor text-sm sm:text-base" />
+                          <BsStarFill className="text-brightColor text-sm sm:text-base" />
+                          <BsStarFill className="text-brightColor text-sm sm:text-base" />
+                          <BsStarFill className="text-brightColor text-sm sm:text-base" />
+                          <BsStarHalf className="text-brightColor text-sm sm:text-base" />
+                        </div>
                         
                         <h3 className="font-semibold text-center text-base sm:text-lg">
                           LKR {item.price.toFixed(2)}
@@ -123,13 +181,13 @@ const AddToCart = () => {
                         
                         <div className="text-center font-medium text-brightColor pt-1">
                           Subtotal: LKR {(item.price * item.quantity).toFixed(2)}
-                        <button 
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700 p-1 ml-5"
-                          aria-label="Remove item"
-                        >
-                          <FaTrash />
-                        </button>
+                          <button 
+                            onClick={() => removeItem(item.id)}
+                            className="text-red-500 hover:text-red-700 p-1 ml-5"
+                            aria-label="Remove item"
+                          >
+                            <FaTrash />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -166,6 +224,7 @@ const AddToCart = () => {
           )}
         </motion.div>
       </div>
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
   );
 };

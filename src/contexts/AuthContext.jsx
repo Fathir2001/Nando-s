@@ -27,8 +27,8 @@ export function AuthProvider({ children }) {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Register function
-  async function register(fullName, email, password) {
+  // Updated Register function with phone and address
+  async function register(fullName, email, password, phone, address) {
     try {
       // Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -38,11 +38,13 @@ export function AuthProvider({ children }) {
         displayName: fullName
       });
       
-      // Add user to Firestore
+      // Add user to Firestore with phone and address
       await setDoc(doc(db, "users", userCredential.user.uid), {
         uid: userCredential.user.uid,
         fullName,
         email,
+        phone,
+        address,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -130,14 +132,18 @@ export function AuthProvider({ children }) {
       
       if (userSnap.exists()) {
         const userData = userSnap.data();
+        console.log("User data from Firestore:", userData);
         setUserProfile(userData);
         return userData;
       } else {
         // No profile found in Firestore, create one
+        console.log("No user profile found, creating new one");
         const newProfile = {
           uid: currentUser.uid,
           fullName: currentUser.displayName || "",
           email: currentUser.email,
+          phone: "",
+          address: "",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         };

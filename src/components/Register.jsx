@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUser, FaLock, FaEye, FaEyeSlash, FaEnvelope } from "react-icons/fa";
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import { BiRestaurant } from "react-icons/bi";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -11,6 +11,8 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    phone: "",
+    address: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,6 +53,16 @@ const Register = () => {
       newErrors.confirmPassword = "Passwords don't match";
     }
     
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      newErrors.phone = "Please enter a valid 10-digit phone number";
+    }
+    
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,8 +75,15 @@ const Register = () => {
       setServerError("");
       
       try {
-        await register(formData.fullName, formData.email, formData.password);
-        navigate("/login"); // Redirect to home after successful registration
+        // Pass phone and address to the register function
+        await register(
+          formData.fullName, 
+          formData.email, 
+          formData.password, 
+          formData.phone, 
+          formData.address
+        );
+        navigate("/login"); // Redirect to login after successful registration
       } catch (error) {
         console.error("Registration error:", error);
         
@@ -181,6 +200,48 @@ const Register = () => {
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+            
+            {/* Phone Number Field - New */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaPhone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-brightColor focus:border-brightColor focus:z-10 sm:text-sm"
+                placeholder="Phone Number"
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
+            
+            {/* Address Field - New */}
+            <div className="relative">
+              <div className="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                <FaMapMarkerAlt className="h-5 w-5 text-gray-400" />
+              </div>
+              <textarea
+                id="address"
+                name="address"
+                rows="3"
+                autoComplete="street-address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-brightColor focus:border-brightColor focus:z-10 sm:text-sm"
+                placeholder="Delivery Address"
+              ></textarea>
+              {errors.address && (
+                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
               )}
             </div>
             
