@@ -10,12 +10,11 @@ import {
 } from "firebase/firestore";
 import React, { useState } from "react";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
-import { FaCartPlus } from "react-icons/fa";
+import { FaCartPlus, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase/config";
-import Button from "./Button";
 
 const DishesCard = (props) => {
   const { currentUser } = useAuth();
@@ -147,7 +146,14 @@ const DishesCard = (props) => {
               )}
             </button>
           ) : (
-            <Button title="Login" to="/login" />
+            <button
+              disabled
+              className="p-2 text-white bg-gray-400 rounded-full cursor-not-allowed opacity-60"
+              title="Login required to add items"
+              aria-label="Login required"
+            >
+              <FaLock size={16} />
+            </button>
           )}
         </div>
       </div>
