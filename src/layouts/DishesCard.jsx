@@ -15,29 +15,11 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase/config";
+import { getStorableImageName } from "../utils/imageUtils";
 
 const DishesCard = (props) => {
   const { currentUser } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
-
-  // Helper function to convert image path to a Firebase-friendly format
-  const getImageUrl = (imgPath) => {
-    // If the path is already a full URL, return it
-    if (imgPath.startsWith("http")) {
-      return imgPath;
-    }
-
-    // For local assets, we need to store just the filename or relative path
-    // This assumes props.img is the imported webpack module that resolves to a URL
-    try {
-      // Get just the filename from the path
-      const pathParts = imgPath.split("/");
-      return pathParts[pathParts.length - 1];
-    } catch (e) {
-      console.error("Error processing image path:", e);
-      return imgPath; // Return original as fallback
-    }
-  };
 
   const addToCart = async () => {
     if (!currentUser) {
@@ -62,18 +44,16 @@ const DishesCard = (props) => {
       const priceValue = parseFloat(props.price.replace("LKR ", ""));
 
       if (querySnapshot.empty) {
-        // Extract just the filename for storage
-        const imageName = typeof props.img === 'string' 
-          ? props.img.split('/').pop() 
-          : props.title.toLowerCase().replace(/\s+/g, '');
-      
+        // Store a clean reference to the image
+        const imageReference = getStorableImageName(props.img);
+        
         // Item is not in cart, add new item
         const itemData = {
           userId: currentUser.uid,
           itemName: props.title,
           price: priceValue,
           quantity: 1,
-          image: imageName, // Store just the filename
+          image: imageReference,
           addedAt: new Date(),
         };
 
@@ -119,8 +99,7 @@ const DishesCard = (props) => {
           loading="lazy"
           onError={(e) => {
             console.error(`Image failed to load: ${props.img}`);
-            e.target.src =
-              "https://via.placeholder.com/300x225?text=Image+Not+Found";
+            e.target.src = "/assets/placeholder.jpg";
           }}
         />
       </div>

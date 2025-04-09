@@ -1,4 +1,4 @@
-// Import all menu images
+// Import all images once to ensure they get bundled
 import dish1 from "../assets/img/dish1.jpg";
 import dish2 from "../assets/img/dish2.jpg";
 import dish3 from "../assets/img/dish3.jpg";
@@ -37,46 +37,49 @@ import shake6 from "../assets/img/shake6.jpg";
 import shake7 from "../assets/img/shake7.jpg";
 import shake8 from "../assets/img/shake8.webp";
 
-// Create a map of image names to their imported module
+// Import placeholder image for error cases
+import placeholderImg from "../assets/img/placeholder.jpg";
+
+// Create a map of image base names to their imported modules
 const imageMap = {
   // Dishes
-  'dish1.jpg': dish1,
-  'dish2.jpg': dish2,
-  'dish3.jpg': dish3,
-  'dish4.jpg': dish4,
-  'dish5.jpg': dish5,
-  'dish6.jpg': dish6,
-  'dish7.jpg': dish7,
-  'dish8.jpg': dish8,
-  'dish9.jpg': dish9,
-  'dish10.jpg': dish10,
-  'dish11.jpg': dish11,
-  'dish12.jpeg': dish12,
+  'dish1': dish1,
+  'dish2': dish2,
+  'dish3': dish3,
+  'dish4': dish4,
+  'dish5': dish5,
+  'dish6': dish6,
+  'dish7': dish7,
+  'dish8': dish8,
+  'dish9': dish9,
+  'dish10': dish10,
+  'dish11': dish11,
+  'dish12': dish12,
   
   // Desserts
-  'dessert1.jpg': dessert1,
-  'dessert2.jpg': dessert2,
-  'dessert3.jpg': dessert3,
+  'dessert1': dessert1,
+  'dessert2': dessert2,
+  'dessert3': dessert3,
   
   // Juices
-  'juice1.jpg': juice1,
-  'juice2.jpg': juice2,
-  'juice3.jpg': juice3,
-  'juice4.jpg': juice4,
-  'juice5.jpg': juice5,
-  'juice6.jpg': juice6,
-  'juice7.jpg': juice7,
-  'juice8.jpg': juice8,
+  'juice1': juice1,
+  'juice2': juice2,
+  'juice3': juice3,
+  'juice4': juice4,
+  'juice5': juice5,
+  'juice6': juice6,
+  'juice7': juice7,
+  'juice8': juice8,
   
   // Shakes
-  'shake1.webp': shake1,
-  'shake2.jpg': shake2,
-  'shake3.jpg': shake3,
-  'shake4.jpg': shake4,
-  'shake5.jpg': shake5,
-  'shake6.jpg': shake6,
-  'shake7.jpg': shake7,
-  'shake8.webp': shake8,
+  'shake1': shake1,
+  'shake2': shake2,
+  'shake3': shake3,
+  'shake4': shake4,
+  'shake5': shake5,
+  'shake6': shake6,
+  'shake7': shake7,
+  'shake8': shake8,
 };
 
 /**
@@ -89,27 +92,82 @@ export const getImageUrl = (imagePath) => {
   if (typeof imagePath === 'string' && (imagePath.startsWith('http') || imagePath.startsWith('data:'))) {
     return imagePath;
   }
-
+  
   // If it's already a processed module (webpack import result), return it directly
   if (typeof imagePath !== 'string') {
     return imagePath;
   }
-
-  // Extract the filename from the path
-  let filename;
-  if (typeof imagePath === 'string') {
-    // Handle paths like "/src/assets/img/dish1.jpg" or "dish1.jpg"
-    filename = imagePath.split('/').pop();
-  } else {
-    console.error("Invalid image path:", imagePath);
-    return "https://i.ibb.co/vH8XTCm/placeholder-food.png"; // Fallback image
+  
+  try {
+    // Clean the path to extract the base name
+    let baseName;
+    
+    // Handle different formats of paths
+    if (imagePath.includes('/')) {
+      // It's a path like "/src/assets/img/dish1.jpg"
+      const filename = imagePath.split('/').pop();
+      baseName = filename.split('.')[0]; // Remove extension
+    } else if (imagePath.includes('.')) {
+      // It's just a filename with extension like "dish1.jpg"
+      baseName = imagePath.split('.')[0];
+    } else {
+      // It's already a base name like "dish1"
+      baseName = imagePath;
+    }
+    
+    // Handle webpack hash in filenames (dish1-abc123.jpg)
+    if (baseName.includes('-')) {
+      baseName = baseName.split('-')[0];
+    }
+    
+    // Look up in our image map using the base name
+    if (imageMap[baseName]) {
+      return imageMap[baseName];
+    }
+    
+    console.warn(`Image not found in imageMap: ${imagePath} (baseName: ${baseName})`);
+    return placeholderImg;
+  } catch (error) {
+    console.error("Error processing image path:", error, imagePath);
+    return placeholderImg;
   }
+};
 
-  // Look up in our image map
-  if (imageMap[filename]) {
-    return imageMap[filename];
+/**
+ * Prepares an image reference for storage in the database
+ * @param {string|object} imgPath - The image path or imported module
+ * @returns {string} A clean reference suitable for database storage
+ */
+export const getStorableImageName = (imgPath) => {
+  // If it's not a string (likely a webpack module), extract info from props title
+  if (typeof imgPath !== 'string') {
+    return "placeholder";
   }
-
-  console.warn(`Image not found in imageMap: ${filename}`);
-  return "https://i.ibb.co/vH8XTCm/placeholder-food.png"; // Fallback image
+  
+  try {
+    let baseName;
+    
+    // Handle different path formats
+    if (imgPath.includes('/')) {
+      // It's a path like "/src/assets/img/dish1.jpg"
+      const filename = imgPath.split('/').pop();
+      baseName = filename.split('.')[0]; // Remove extension
+    } else if (imgPath.includes('.')) {
+      // It's just a filename with extension like "dish1.jpg"
+      baseName = imgPath.split('.')[0];
+    } else {
+      // It's already a base name like "dish1"
+      baseName = imgPath;
+    }
+    
+    // Handle webpack hash in filenames (dish1-abc123.jpg)
+    if (baseName.includes('-')) {
+      baseName = baseName.split('-')[0];
+    }
+    
+    return baseName;
+  } catch (error) {
+    console.error("Error processing image path for storage:", error, imgPath);
+    return "placeholder";
+  }
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaTrash } from "react-icons/fa";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
 import { useAuth } from "../contexts/AuthContext";
@@ -172,8 +172,7 @@ const AddToCart = () => {
                           onError={(e) => {
                             console.log("Image failed to load:", item.image);
                             e.target.onerror = null; // Prevent infinite loop of error
-                            e.target.src =
-                              "https://i.ibb.co/vH8XTCm/placeholder-food.png";
+                            e.target.src = "/assets/placeholder.jpg";
                           }}
                           loading="lazy"
                         />
