@@ -1,18 +1,22 @@
-// eslint-disable-next-line no-unused-vars
 import React from "react";
-import dish1 from "../assets/img/dish1.jpg";
-import dish2 from "../assets/img/dish2.jpg";
-import dish3 from "../assets/img/dish3.jpg";
-import dish4 from "../assets/img/dish4.jpg";
-import dish5 from "../assets/img/dish5.jpg";
-import dish6 from "../assets/img/dish6.jpg";
-import dish7 from "../assets/img/dish7.jpg";
-import dish8 from "../assets/img/dish8.jpg";
-import dish9 from "../assets/img/dish9.jpg";
-import dish10 from "../assets/img/dish10.jpg";
-import dish11 from "../assets/img/dish11.jpg";
-import dish12 from "../assets/img/dish12.jpeg";
+import { getImageUrl } from "../utils/imageUtils";
 import DishesCard from "../layouts/DishesCard";
+
+// Create dish data objects with proper image references
+const dishesData = [
+  { id: 1, img: "dish1.jpg", title: "BBQ", price: "LKR 700" },
+  { id: 2, img: "dish2.jpg", title: "Chicken Submarine", price: "LKR 650" },
+  { id: 3, img: "dish3.jpg", title: "Chicken Burger", price: "LKR 550" },
+  { id: 4, img: "dish4.jpg", title: "Crispy Chicken Burger", price: "LKR 700" },
+  { id: 5, img: "dish5.jpg", title: "Chicken Fried Rice", price: "LKR 850" },
+  { id: 6, img: "dish6.jpg", title: "Beef Fried Rice", price: "LKR 900" },
+  { id: 7, img: "dish7.jpg", title: "Egg Fried Rice", price: "LKR 700" },
+  { id: 8, img: "dish8.jpg", title: "Chicken Noodles", price: "LKR 850" },
+  { id: 9, img: "dish9.jpg", title: "Beef Noodles", price: "LKR 950" },
+  { id: 10, img: "dish10.jpg", title: "Egg Noodles", price: "LKR 700" },
+  { id: 11, img: "dish11.jpg", title: "Chicken Dolphin", price: "LKR 900" },
+  { id: 12, img: "dish12.jpeg", title: "Beef Dolphin", price: "LKR 900" },
+];
 
 const Dishes = () => {
   return (
@@ -22,18 +26,14 @@ const Dishes = () => {
       </h1>
 
       <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
-        <DishesCard img={dish1} title="BBQ" price="LKR 700" />
-        <DishesCard img={dish2} title="Chicken Submarine" price="LKR 650" />
-        <DishesCard img={dish3} title="Chicken Burger" price="LKR 550" />
-        <DishesCard img={dish4} title="Crispy Chicken Burger" price="LKR 700" />
-        <DishesCard img={dish5} title="Chicken Fried Rice" price="LKR 850" />
-        <DishesCard img={dish6} title="Beef Fried Rice" price="LKR 900" />
-        <DishesCard img={dish7} title="Egg Fried Rice" price="LKR 700" />
-        <DishesCard img={dish8} title="Chicken Noodles" price="LKR 850" />
-        <DishesCard img={dish9} title="Beef Noodles" price="LKR 950" />
-        <DishesCard img={dish10} title="Egg Noodles" price="LKR 700" />
-        <DishesCard img={dish11} title="Chicken Dolphin" price="LKR 900" />
-        <DishesCard img={dish12} title="Beef Dolphin" price="LKR 900" />
+        {dishesData.map((dish) => (
+          <DishesCard 
+            key={dish.id}
+            img={getImageUrl(dish.img)} 
+            title={dish.title} 
+            price={dish.price} 
+          />
+        ))}
       </div>
     </div>
   );

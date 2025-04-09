@@ -16,6 +16,7 @@ import {
 import { db } from "../firebase/config";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getImageUrl } from "../utils/imageUtils";
 
 const AddToCart = () => {
   const { currentUser } = useAuth();
@@ -165,20 +166,14 @@ const AddToCart = () => {
                     >
                       <div className="aspect-[4/3] overflow-hidden rounded-xl">
                         <img
-                          src={
-                            typeof item.image === "string"
-                              ? item.image
-                              : require(`../assets/img/${item.image
-                                  .split("/")
-                                  .pop()}`)
-                          }
+                          src={getImageUrl(item.image)}
                           alt={item.itemName}
                           className="w-full h-full object-cover rounded-xl"
                           onError={(e) => {
                             console.log("Image failed to load:", item.image);
                             e.target.onerror = null; // Prevent infinite loop of error
                             e.target.src =
-                              "https://i.ibb.co/vH8XTCm/placeholder-food.png"; // Using a reliable placeholder
+                              "https://i.ibb.co/vH8XTCm/placeholder-food.png";
                           }}
                           loading="lazy"
                         />

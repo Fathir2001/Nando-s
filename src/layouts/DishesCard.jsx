@@ -62,13 +62,18 @@ const DishesCard = (props) => {
       const priceValue = parseFloat(props.price.replace("LKR ", ""));
 
       if (querySnapshot.empty) {
+        // Extract just the filename for storage
+        const imageName = typeof props.img === 'string' 
+          ? props.img.split('/').pop() 
+          : props.title.toLowerCase().replace(/\s+/g, '');
+      
         // Item is not in cart, add new item
         const itemData = {
           userId: currentUser.uid,
           itemName: props.title,
           price: priceValue,
           quantity: 1,
-          image: props.img, // Store the image path/URL
+          image: imageName, // Store just the filename
           addedAt: new Date(),
         };
 
