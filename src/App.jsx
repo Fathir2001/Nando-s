@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
@@ -15,6 +11,7 @@ import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
 import OrderDetail from "./components/OrderDetail";
+import AddToCart from "./components/AddToCart";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Desserts from "./components/Desserts";
@@ -95,6 +92,15 @@ const App = () => {
             element={
               <ProtectedRouteWrapper>
                 <OrderDetail />
+              </ProtectedRouteWrapper>
+            }
+          />
+          {/* New route for cart page */}
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRouteWrapper>
+                <AddToCart />
               </ProtectedRouteWrapper>
             }
           />

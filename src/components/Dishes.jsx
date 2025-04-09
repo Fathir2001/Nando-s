@@ -21,7 +21,7 @@ const Dishes = () => {
         Our Dishes
       </h1>
 
-      <div className="flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-8 w-full">
+      <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 lg:gap-8 justify-center">
         <DishesCard img={dish1} title="BBQ" price="LKR 700" />
         <DishesCard img={dish2} title="Chicken Submarine" price="LKR 650" />
         <DishesCard img={dish3} title="Chicken Burger" price="LKR 550" />
