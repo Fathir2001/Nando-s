@@ -14,6 +14,7 @@ import {
   updateDoc,
   addDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { toast } from "react-toastify";
@@ -110,38 +111,77 @@ const AddToCart = () => {
   // Handle order submission after confirmation
   const submitOrder = async () => {
     if (cartItems.length === 0) return;
-    
+
     setProcessing(true);
-    
+
     try {
       // Create a new order in the orders collection
       const orderData = {
         userId: currentUser.uid,
-        items: cartItems.map(item => ({
+        items: cartItems.map((item) => ({
           itemName: item.itemName,
           price: item.price,
           quantity: item.quantity,
           image: item.image,
-          subtotal: item.price * item.quantity
+          subtotal: item.price * item.quantity,
         })),
         subtotal: subtotal,
         deliveryFee: deliveryFee,
         totalAmount: total,
         status: "Pending",
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       };
-      
+
       // Add the order to Firestore
       const orderRef = await addDoc(collection(db, "orders"), orderData);
-      
+
+      // Get the order ID
+      const orderId = orderRef.id;
+
       // Clear the user's cart
       for (const item of cartItems) {
         await deleteDoc(doc(db, "cart", item.id));
       }
-      
+
+      // Send email notification
+      try {
+        // Get user profile from Firestore
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        const userData = userDoc.data() || {};
+
+        // Prepare data for email
+        const emailData = {
+          order: {
+            id: orderId,
+            ...orderData,
+            // Convert Firebase timestamp to string for JSON serialization
+            createdAt: new Date().toISOString(),
+          },
+          user: {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            phone: userData.phone || "",
+            address: userData.address || "",
+          },
+        };
+
+        // Call the serverless function
+        await fetch("/.netlify/functions/sendOrderEmail", {
+          method: "POST",
+          body: JSON.stringify(emailData),
+        });
+
+        console.log("Email notification sent");
+      } catch (emailError) {
+        console.error("Error sending email notification:", emailError);
+        // Don't fail the order if email fails
+      }
+
       // Show success message
       toast.success("Order placed successfully!");
-      
+
       // Redirect to home or order confirmation page
       navigate("/");
     } catch (error) {
@@ -153,6 +193,7 @@ const AddToCart = () => {
     }
   };
 
+  // ...existing code...
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-10 pb-12 flex items-center justify-center">
@@ -318,7 +359,7 @@ const AddToCart = () => {
                       </p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     className="mt-6 w-full bg-brightColor text-white py-3 px-4 rounded-md hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor transition-colors"
                     onClick={handleConfirmOrder}
                   >
@@ -330,21 +371,29 @@ const AddToCart = () => {
           )}
         </motion.div>
       </div>
-      
+
       {/* Confirmation Dialog */}
       {showConfirmDialog && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            
+
             {/* Modal panel */}
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div 
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div
               className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-              role="dialog" 
-              aria-modal="true" 
+              role="dialog"
+              aria-modal="true"
               aria-labelledby="modal-headline"
             >
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -353,12 +402,17 @@ const AddToCart = () => {
                     <FaCheckCircle className="h-6 w-6 text-brightColor" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                    <h3
+                      className="text-lg leading-6 font-medium text-gray-900"
+                      id="modal-headline"
+                    >
                       Confirm Your Order
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to confirm this order? A total of LKR {total.toFixed(2)} will be charged. (Cash on Delivery)
+                        Are you sure you want to confirm this order? A total of
+                        LKR {total.toFixed(2)} will be charged. (Cash on
+                        Delivery)
                       </p>
                     </div>
                   </div>
@@ -367,14 +421,19 @@ const AddToCart = () => {
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"
-                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brightColor text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor sm:ml-3 sm:w-auto sm:text-sm ${processing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brightColor text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor sm:ml-3 sm:w-auto sm:text-sm ${
+                    processing ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                   onClick={submitOrder}
                   disabled={processing}
                 >
                   {processing ? (
-                    <><span className="animate-spin mr-2">&#8987;</span> Processing...</>
+                    <>
+                      <span className="animate-spin mr-2">&#8987;</span>{" "}
+                      Processing...
+                    </>
                   ) : (
-                    'Confirm'
+                    "Confirm"
                   )}
                 </button>
                 <button
