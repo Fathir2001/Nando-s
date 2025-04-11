@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTrash } from "react-icons/fa";
+import { FaArrowLeft, FaTrash, FaCheckCircle } from "react-icons/fa";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -12,8 +12,11 @@ import {
   doc,
   deleteDoc,
   updateDoc,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getImageUrl } from "../utils/imageUtils";
 
@@ -25,6 +28,9 @@ const AddToCart = () => {
   const [loading, setLoading] = useState(true);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(150);
+  // Add a state for the confirmation dialog
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   // Fetch cart items from Firestore
   useEffect(() => {
@@ -95,6 +101,57 @@ const AddToCart = () => {
 
   // Calculate total
   const total = subtotal + deliveryFee;
+
+  // Handle opening the confirmation dialog
+  const handleConfirmOrder = () => {
+    setShowConfirmDialog(true);
+  };
+
+  // Handle order submission after confirmation
+  const submitOrder = async () => {
+    if (cartItems.length === 0) return;
+    
+    setProcessing(true);
+    
+    try {
+      // Create a new order in the orders collection
+      const orderData = {
+        userId: currentUser.uid,
+        items: cartItems.map(item => ({
+          itemName: item.itemName,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          subtotal: item.price * item.quantity
+        })),
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        totalAmount: total,
+        status: "Pending",
+        createdAt: serverTimestamp()
+      };
+      
+      // Add the order to Firestore
+      const orderRef = await addDoc(collection(db, "orders"), orderData);
+      
+      // Clear the user's cart
+      for (const item of cartItems) {
+        await deleteDoc(doc(db, "cart", item.id));
+      }
+      
+      // Show success message
+      toast.success("Order placed successfully!");
+      
+      // Redirect to home or order confirmation page
+      navigate("/");
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Failed to place order. Please try again.");
+      setShowConfirmDialog(false);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -261,8 +318,11 @@ const AddToCart = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-brightColor text-white py-3 px-4 rounded-md hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor transition-colors">
-                    Proceed to Checkout
+                  <button 
+                    className="mt-6 w-full bg-brightColor text-white py-3 px-4 rounded-md hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor transition-colors"
+                    onClick={handleConfirmOrder}
+                  >
+                    Confirm Order
                   </button>
                 </div>
               </div>
@@ -270,6 +330,66 @@ const AddToCart = () => {
           )}
         </motion.div>
       </div>
+      
+      {/* Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            {/* Modal panel */}
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div 
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              role="dialog" 
+              aria-modal="true" 
+              aria-labelledby="modal-headline"
+            >
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <FaCheckCircle className="h-6 w-6 text-brightColor" />
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                      Confirm Your Order
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Are you sure you want to confirm this order? A total of LKR {total.toFixed(2)} will be charged. (Cash on Delivery)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brightColor text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor sm:ml-3 sm:w-auto sm:text-sm ${processing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  onClick={submitOrder}
+                  disabled={processing}
+                >
+                  {processing ? (
+                    <><span className="animate-spin mr-2">&#8987;</span> Processing...</>
+                  ) : (
+                    'Confirm'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brightColor sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setShowConfirmDialog(false)}
+                  disabled={processing}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
