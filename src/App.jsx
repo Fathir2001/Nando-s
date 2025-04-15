@@ -23,6 +23,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { motion } from "framer-motion";
 import { FaLock, FaInfoCircle } from "react-icons/fa";
 import OrderList from "./components/OrderList";
+import PrflOrdrDetails from "./components/PrflOrdrDetails";
 
 // Login Notification Component
 const LoginNotification = () => {
@@ -158,6 +159,7 @@ const App = () => {
               </ProtectedRouteWrapper>
             }
           />
+          <Route path="/order/:orderId" element={<PrflOrdrDetails />} />
         </Routes>
         {/* Add ToastContainer here so it's accessible throughout the app */}
         <ToastContainer
