@@ -1,20 +1,18 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, updateDoc, getDoc, serverTimestamp } = require('firebase/firestore');
+const admin = require('firebase-admin');
 
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-  measurementId: process.env.FIREBASE_MEASUREMENT_ID
-};
+// Initialize Firebase Admin SDK (only once)
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+    }),
+    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+  });
+}
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = admin.firestore();
 
 exports.handler = async function(event, context) {
   // Only allow GET requests (for link clicks from email)
@@ -134,11 +132,11 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Update order status in Firestore
-    const orderRef = doc(db, "orders", orderId);
-    const orderDoc = await getDoc(orderRef);
+    // Update order status in Firestore using Admin SDK
+    const orderRef = db.collection('orders').doc(orderId);
+    const orderDoc = await orderRef.get();
     
-    if (!orderDoc.exists()) {
+    if (!orderDoc.exists) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'text/html' },
@@ -171,10 +169,10 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Update the order
-    await updateDoc(orderRef, {
+    // Update the order with Admin SDK
+    await orderRef.update({
       status: status,
-      updatedAt: serverTimestamp()
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
     // Return success page with HTML
