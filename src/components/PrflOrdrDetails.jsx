@@ -101,6 +101,10 @@ const PrflOrdrDetails = () => {
     }
   }, [order]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Format date for display
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
