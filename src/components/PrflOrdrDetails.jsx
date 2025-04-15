@@ -205,7 +205,7 @@ const PrflOrdrDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-8 pb-12">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brightColor"></div>
           <p className="mt-4 text-gray-600">Loading order details...</p>
@@ -216,7 +216,7 @@ const PrflOrdrDetails = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-24 pb-12">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-8 pb-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <div className="text-red-500 text-xl mb-4">Error: {error}</div>
@@ -234,7 +234,7 @@ const PrflOrdrDetails = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-24 pb-12">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-8 pb-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <div className="text-gray-500 text-xl mb-4">Order not found</div>
@@ -251,7 +251,7 @@ const PrflOrdrDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-8 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -10 }}

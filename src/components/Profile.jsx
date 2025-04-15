@@ -166,7 +166,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pt-8 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
