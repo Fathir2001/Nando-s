@@ -22,6 +22,7 @@ import Shakes from "./components/Shakes";
 import { useAuth } from "./contexts/AuthContext";
 import { motion } from "framer-motion";
 import { FaLock, FaInfoCircle } from "react-icons/fa";
+import OrderList from "./components/OrderList";
 
 // Login Notification Component
 const LoginNotification = () => {
@@ -135,6 +136,14 @@ const App = () => {
           />
           <Route
             path="/orders"
+            element={
+              <ProtectedRouteWrapper>
+                <OrderList />
+              </ProtectedRouteWrapper>
+            }
+          />
+          <Route
+            path="/order/:orderId"
             element={
               <ProtectedRouteWrapper>
                 <OrderDetail />

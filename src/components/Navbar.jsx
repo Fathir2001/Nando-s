@@ -31,7 +31,7 @@ const Navbar = () => {
     setMenu(false);
     setShowMenuDropdown(false);
   };
-  
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -44,7 +44,7 @@ const Navbar = () => {
   const toggleMenuDropdown = () => {
     setShowMenuDropdown(!showMenuDropdown);
   };
-  
+
   const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);
   };
@@ -59,9 +59,9 @@ const Navbar = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -72,37 +72,40 @@ const Navbar = () => {
         setCartCount(0);
         return;
       }
-      
+
       try {
         const cartRef = collection(db, "cart");
         const q = query(cartRef, where("userId", "==", currentUser.uid));
         const querySnapshot = await getDocs(q);
-        
+
         // Sum up quantities of all items
         const totalItems = querySnapshot.docs.reduce((count, doc) => {
           return count + doc.data().quantity;
         }, 0);
-        
+
         setCartCount(totalItems);
       } catch (error) {
         console.error("Error fetching cart count:", error);
       }
     };
-    
+
     getCartCount();
   }, [currentUser]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (menuDropdownRef.current && !menuDropdownRef.current.contains(event.target)) {
+      if (
+        menuDropdownRef.current &&
+        !menuDropdownRef.current.contains(event.target)
+      ) {
         setShowMenuDropdown(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -110,9 +113,17 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : ''}`}>
+    <div
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-white shadow-md" : ""
+      }`}
+    >
       <div>
-        <div className={`flex flex-row justify-between p-4 md:p-5 md:px-16 lg:px-32 ${!scrolled ? 'bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]' : ''}`}>
+        <div
+          className={`flex flex-row justify-between p-4 md:p-5 md:px-16 lg:px-32 ${
+            !scrolled ? "bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]" : ""
+          }`}
+        >
           <div className="flex flex-row items-center cursor-pointer">
             <span>
               <BiRestaurant size={40} className="text-brightColor" />
@@ -132,17 +143,20 @@ const Navbar = () => {
             </ScrollLink>
 
             <div className="relative" ref={menuDropdownRef}>
-              <div 
+              <div
                 className="flex items-center gap-1 cursor-pointer hover:text-brightColor transition-all"
                 onClick={toggleMenuDropdown}
               >
                 <span>Menu</span>
-                <BiChevronDown size={20} className={`transform transition-transform ${showMenuDropdown ? 'rotate-180' : ''}`} />
+                <BiChevronDown
+                  size={20}
+                  className={`transform transition-transform ${
+                    showMenuDropdown ? "rotate-180" : ""
+                  }`}
+                />
               </div>
               {showMenuDropdown && (
-                <ul 
-                  className="absolute left-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg py-2 shadow-lg z-50"
-                >
+                <ul className="absolute left-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg py-2 shadow-lg z-50">
                   <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
                     <ScrollLink
                       to="dishes"
@@ -218,8 +232,8 @@ const Navbar = () => {
             {currentUser ? (
               <div className="flex items-center gap-4">
                 {/* Cart Icon for logged-in users */}
-                <Link 
-                  to="/cart" 
+                <Link
+                  to="/cart"
                   className="relative hover:text-brightColor transition-all"
                   title="View Cart"
                 >
@@ -230,26 +244,28 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link>
-                
+
                 <div className="relative" ref={userMenuRef}>
-                  <div 
+                  <div
                     className="flex items-center gap-2 cursor-pointer hover:text-brightColor"
                     onClick={toggleUserMenu}
                   >
                     <BiUserCircle size={28} className="text-brightColor" />
-                    <span className="hidden lg:inline">{currentUser.displayName || "User"}</span>
+                    <span className="hidden lg:inline">
+                      {currentUser.displayName || "User"}
+                    </span>
                     <BiChevronDown className="cursor-pointer" size={20} />
                   </div>
                   {showUserMenu && (
                     <ul className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg p-2 shadow-lg z-50">
                       <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
-                        <Link to="/profile" className="block">Profile</Link>
+                        <Link to="/profile" className="block">
+                          Profile
+                        </Link>
                       </li>
-                      <li className="py-2 px-4 hover:bg-gray-100 rounded-md">
-                        <Link to="/orders" className="block">My Orders</Link>
-                      </li>
+                      {/* My Orders tab removed from here */}
                       <li className="py-2 px-4 hover:bg-gray-100 rounded-md border-t border-gray-200 mt-1 pt-3">
-                        <button 
+                        <button
                           onClick={handleLogout}
                           className="w-full text-left text-red-500"
                         >
@@ -267,8 +283,8 @@ const Navbar = () => {
 
           <div className="md:hidden flex items-center">
             {currentUser && (
-              <Link 
-                to="/cart" 
+              <Link
+                to="/cart"
                 className="relative mr-4 hover:text-brightColor transition-all"
                 title="View Cart"
               >
@@ -280,11 +296,19 @@ const Navbar = () => {
                 )}
               </Link>
             )}
-            
+
             {menu ? (
-              <AiOutlineClose size={25} onClick={handleChange} className="cursor-pointer" />
+              <AiOutlineClose
+                size={25}
+                onClick={handleChange}
+                className="cursor-pointer"
+              />
             ) : (
-              <AiOutlineMenuUnfold size={25} onClick={handleChange} className="cursor-pointer" />
+              <AiOutlineMenuUnfold
+                size={25}
+                onClick={handleChange}
+                className="cursor-pointer"
+              />
             )}
           </div>
         </div>
@@ -303,13 +327,18 @@ const Navbar = () => {
           >
             Home
           </ScrollLink>
-          
+
           <div className="relative">
-            <div 
+            <div
               className="hover:text-brightColor transition-all cursor-pointer flex items-center justify-center"
               onClick={() => setShowMenuDropdown(!showMenuDropdown)}
             >
-              Menu <BiChevronDown className={`inline ml-1 transform transition-transform ${showMenuDropdown ? 'rotate-180' : ''}`} />
+              Menu{" "}
+              <BiChevronDown
+                className={`inline ml-1 transform transition-transform ${
+                  showMenuDropdown ? "rotate-180" : ""
+                }`}
+              />
             </div>
             {showMenuDropdown && (
               <div className="flex flex-col gap-2 mt-2 text-base bg-gray-900 py-2 rounded-md mx-8">

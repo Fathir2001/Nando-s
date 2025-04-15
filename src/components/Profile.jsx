@@ -380,7 +380,6 @@ const Profile = () => {
                         <p className="font-medium">
                           {userProfile?.phone || "Not provided"}
                         </p>
-                        {console.log("Phone in display:", userProfile?.phone)}
                       </div>
                     </div>
 
@@ -441,32 +440,7 @@ const Profile = () => {
                     >
                       Browse Menu
                     </button>
-
-                    {/* Add this for testing only - remove in production */}
-                    <div className="mt-4">
-                      <button
-                        onClick={async () => {
-                          try {
-                            const { createSampleOrders } = await import(
-                              "../utils/createSampleOrders"
-                            );
-                            await createSampleOrders(currentUser.uid);
-                            window.location.reload();
-                          } catch (err) {
-                            console.error(
-                              "Could not create sample orders:",
-                              err
-                            );
-                            alert(
-                              "Could not create sample orders. See console for details."
-                            );
-                          }
-                        }}
-                        className="text-xs text-gray-500 underline hover:text-brightColor"
-                      >
-                        (Create sample orders for testing)
-                      </button>
-                    </div>
+                    {/* The sample order button has been removed from here */}
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
