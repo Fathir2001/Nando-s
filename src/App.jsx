@@ -12,7 +12,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
-import OrderDetail from "./components/OrderDetail";
+import OrderDetail from "./components/OrderDetail";  // Consider renaming this to avoid confusion
 import AddToCart from "./components/AddToCart";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -143,6 +143,8 @@ const App = () => {
               </ProtectedRouteWrapper>
             }
           />
+          {/* REMOVE or COMMENT OUT this first definition of /order/:orderId */}
+          {/* 
           <Route
             path="/order/:orderId"
             element={
@@ -151,6 +153,7 @@ const App = () => {
               </ProtectedRouteWrapper>
             }
           />
+          */}
           <Route
             path="/cart"
             element={
@@ -159,7 +162,15 @@ const App = () => {
               </ProtectedRouteWrapper>
             }
           />
-          <Route path="/order/:orderId" element={<PrflOrdrDetails />} />
+          {/* Keep only this one route for viewing orders */}
+          <Route 
+            path="/order/:orderId" 
+            element={
+              <ProtectedRouteWrapper>
+                <PrflOrdrDetails />
+              </ProtectedRouteWrapper>
+            } 
+          />
         </Routes>
         {/* Add ToastContainer here so it's accessible throughout the app */}
         <ToastContainer

@@ -15,7 +15,7 @@ import { useAuth } from "../contexts/AuthContext";
 const PrflOrdrDetails = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { userProfile } = useAuth();
+  const { currentUser, userProfile } = useAuth();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,117 +23,67 @@ const PrflOrdrDetails = () => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-  async function fetchOrderDetails() {
-    try {
-      setLoading(true);
-      console.log("Fetching order details for ID:", orderId);
-      console.log("Current userProfile:", userProfile);
-      
-      const orderRef = doc(db, "orders", orderId);
-      const orderSnap = await getDoc(orderRef);
-      
-      if (orderSnap.exists()) {
-        let orderData = { id: orderSnap.id, ...orderSnap.data() };
-        console.log("Order data fetched:", orderData);
-        
-        // If the order has a userId reference, fetch that user's data
-        if (orderData.userId) {
-          console.log("Found userId in order:", orderData.userId);
-          try {
-            const userRef = doc(db, "users", orderData.userId);
-            const userSnap = await getDoc(userRef);
-            
-            if (userSnap.exists()) {
-              const userData = userSnap.data();
-              console.log("User data fetched:", userData);
-              setUserData(userData);
-              
-              // Check ALL possible field name variations
-              // Directly update order data with user information if missing
-              if (!orderData.customerName) {
-                // Check all possible name field variations
-                orderData.customerName = 
-                  userData.fullName || 
-                  userData.displayName || 
-                  userData.name || 
-                  "Name not found in database";
-                console.log("Setting customer name to:", orderData.customerName);
-              }
-              
-              if (!orderData.customerPhone) {
-                // Check all possible phone field variations
-                orderData.customerPhone = 
-                  userData.phone || 
-                  userData.phoneNumber || 
-                  userData.customerPhone || 
-                  "Phone not found in database";
-                console.log("Setting customer phone to:", orderData.customerPhone);
-              }
-              
-              if (!orderData.deliveryAddress) {
-                // Check all possible address field variations
-                orderData.deliveryAddress = 
-                  userData.address || 
-                  userData.deliveryAddress || 
-                  userData.location || 
-                  "Address not found in database";
-                console.log("Setting delivery address to:", orderData.deliveryAddress);
-              }
-            } else {
-              console.log("User document doesn't exist for ID:", orderData.userId);
-            }
-          } catch (userErr) {
-            console.error("Error fetching user data:", userErr);
-          }
-        } else if (userProfile) {
-          console.log("No userId in order, using current userProfile");
-          
-          // If no userId but we have userProfile, use that
-          if (!orderData.customerName) {
-            orderData.customerName = 
-              userProfile.fullName || 
-              userProfile.displayName || 
-              userProfile.name || 
-              "Name not found in profile";
-            console.log("Setting customer name from profile:", orderData.customerName);
-          }
-          
-          if (!orderData.customerPhone) {
-            orderData.customerPhone = 
-              userProfile.phone || 
-              userProfile.phoneNumber || 
-              userProfile.customerPhone || 
-              "Phone not found in profile";
-            console.log("Setting customer phone from profile:", orderData.customerPhone);
-          }
-          
-          if (!orderData.deliveryAddress) {
-            orderData.deliveryAddress = 
-              userProfile.address || 
-              userProfile.deliveryAddress || 
-              userProfile.location || 
-              "Address not found in profile";
-            console.log("Setting delivery address from profile:", orderData.deliveryAddress);
-          }
-        }
-        
-        console.log("Final order data to be set:", orderData);
-        setOrder(orderData);
-      } else {
-        setError("Order not found");
-      }
-    } catch (err) {
-      console.error("Error fetching order details:", err);
-      setError("Failed to load order details");
-    } finally {
-      setLoading(false);
-    }
-  }
+    async function fetchOrderDetails() {
+      try {
+        setLoading(true);
+        console.log("Fetching order details for ID:", orderId);
+        console.log("Current userProfile from context:", userProfile);
 
-  if (orderId) {
-    fetchOrderDetails();
-  }
-}, [orderId, userProfile]);
+        // Check if we have user profile data from context
+        if (userProfile) {
+          console.log("User profile from context:", {
+            fullName: userProfile.fullName,
+            displayName: userProfile.displayName,
+            phone: userProfile.phone,
+            address: userProfile.address,
+          });
+        }
+
+        const orderRef = doc(db, "orders", orderId);
+        const orderSnap = await getDoc(orderRef);
+
+        if (orderSnap.exists()) {
+          let orderData = { id: orderSnap.id, ...orderSnap.data() };
+          console.log("Order data fetched:", orderData);
+
+          // If this order belongs to the current user, use their profile data
+          if (orderData.userId === currentUser?.uid) {
+            console.log("Order belongs to current user, using userProfile");
+            setUserData(userProfile);
+          }
+          // Otherwise fetch the user data for this order
+          else if (orderData.userId) {
+            console.log("Fetching user data for:", orderData.userId);
+            try {
+              const userRef = doc(db, "users", orderData.userId);
+              const userSnap = await getDoc(userRef);
+
+              if (userSnap.exists()) {
+                const userData = userSnap.data();
+                console.log("User data fetched:", userData);
+                setUserData(userData);
+              }
+            } catch (userErr) {
+              console.error("Error fetching user data:", userErr);
+            }
+          }
+
+          setOrder(orderData);
+        } else {
+          setError("Order not found");
+        }
+      } catch (err) {
+        console.error("Error fetching order details:", err);
+        setError("Failed to load order details");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId, userProfile, currentUser]);
 
   // Format date for display
   const formatDate = (timestamp) => {
@@ -170,28 +120,86 @@ const PrflOrdrDetails = () => {
   // Get user data (either from order, fetched user data, or current user profile)
   const getCustomerName = () => {
     console.log("Getting customer name:", {
-      orderName: order?.customerName,
-      userData: userData?.fullName,
-      userProfile: userProfile?.fullName,
+      order: order?.customerName,
+      userData: userData
+        ? {
+            fullName: userData.fullName,
+            displayName: userData.displayName,
+            name: userData.name,
+          }
+        : null,
+      userProfile: userProfile
+        ? {
+            fullName: userProfile.fullName,
+            displayName: userProfile.displayName,
+          }
+        : null,
     });
 
+    // Order data takes priority
     if (order?.customerName) return order.customerName;
-    if (userData?.fullName) return userData.fullName;
-    if (userProfile?.fullName) return userProfile.fullName;
+
+    // Then check userData (user who placed the order)
+    if (userData) {
+      const name = userData.fullName || userData.displayName || userData.name;
+      if (name) return name;
+    }
+
+    // Then check current user profile
+    if (userProfile) {
+      const name =
+        userProfile.fullName || userProfile.displayName || userProfile.name;
+      if (name) return name;
+    }
+
     return "Not provided";
   };
 
   const getCustomerPhone = () => {
+    console.log("Getting customer phone:", {
+      orderPhone: order?.customerPhone,
+      userData: userData ? { phone: userData.phone } : null,
+      userProfile: userProfile ? { phone: userProfile.phone } : null,
+    });
+
     if (order?.customerPhone) return order.customerPhone;
-    if (userData?.phone) return userData.phone;
-    if (userProfile?.phone) return userProfile.phone;
+
+    if (userData) {
+      const phone = userData.phone || userData.phoneNumber;
+      if (phone) return phone;
+    }
+
+    if (userProfile) {
+      const phone = userProfile.phone || userProfile.phoneNumber;
+      if (phone) return phone;
+    }
+
     return "Not provided";
   };
 
   const getDeliveryAddress = () => {
+    console.log("Getting delivery address:", {
+      orderAddress: order?.deliveryAddress,
+      userData: userData ? { address: userData.address } : null,
+      userProfile: userProfile ? { address: userProfile.address } : null,
+    });
+
     if (order?.deliveryAddress) return order.deliveryAddress;
-    if (userData?.address) return userData.address;
-    if (userProfile?.address) return userProfile.address;
+
+    if (userData) {
+      const address =
+        userData.address || userData.deliveryAddress || userData.location;
+      if (address) return address;
+    }
+
+    if (userProfile) {
+      const address =
+        userProfile.address ||
+        userProfile.deliveryAddress ||
+        userProfile.location;
+      if (address) return address;
+    }
+
     return "Not provided";
   };
 
