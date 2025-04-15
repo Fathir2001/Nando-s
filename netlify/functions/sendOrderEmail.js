@@ -38,6 +38,18 @@ exports.handler = async function(event, context) {
       </tr>`
     ).join('');
 
+    // Generate secure token for order status update
+    const secretKey = process.env.ORDER_SECRET_KEY || 'nandos-secret';
+    const token = Buffer.from(`order-${order.id}-${secretKey}`).toString('base64');
+    
+    // Base URL for the deployed Netlify site
+    const baseUrl = process.env.URL || 'https://nandos-restaurant.netlify.app';
+    
+    // Create status update links
+    const processingLink = `${baseUrl}/.netlify/functions/updateOrderStatus?orderId=${order.id}&token=${token}&status=Processing`;
+    const deliveredLink = `${baseUrl}/.netlify/functions/updateOrderStatus?orderId=${order.id}&token=${token}&status=Delivered`;
+    const cancelledLink = `${baseUrl}/.netlify/functions/updateOrderStatus?orderId=${order.id}&token=${token}&status=Cancelled`;
+
     // Create the email content
     const mailOptions = {
       from: `"Nando's Orders" <${process.env.EMAIL_USER}>`,
@@ -85,6 +97,27 @@ exports.handler = async function(event, context) {
               </tr>
             </tfoot>
           </table>
+          
+          <div style="margin-top: 20px; padding: 20px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px;">
+            <h3 style="color: #e67e22; margin-top: 0;">Update Order Status</h3>
+            <p>Click one of the buttons below to update this order's status:</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${processingLink}" style="display: inline-block; margin: 5px; padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                Mark as Processing
+              </a>
+              
+              <a href="${deliveredLink}" style="display: inline-block; margin: 5px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                Mark as Delivered
+              </a>
+              
+              <a href="${cancelledLink}" style="display: inline-block; margin: 5px; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                Cancel Order
+              </a>
+            </div>
+            
+            <p style="margin: 0; font-size: 12px; color: #666;">These links will update the order status in your system and notify the customer.</p>
+          </div>
           
           <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 4px;">
             <p style="margin: 0;">Please process this order as soon as possible. Thank you!</p>
