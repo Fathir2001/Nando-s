@@ -3,45 +3,142 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { FaArrowLeft, FaClock, FaMapMarkerAlt, FaPhone, FaUser } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaClock,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaUser,
+} from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
 
 const PrflOrdrDetails = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  
+  const { userProfile } = useAuth();
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    async function fetchOrderDetails() {
-      try {
-        setLoading(true);
-        const orderRef = doc(db, "orders", orderId);
-        const orderSnap = await getDoc(orderRef);
+  async function fetchOrderDetails() {
+    try {
+      setLoading(true);
+      console.log("Fetching order details for ID:", orderId);
+      console.log("Current userProfile:", userProfile);
+      
+      const orderRef = doc(db, "orders", orderId);
+      const orderSnap = await getDoc(orderRef);
+      
+      if (orderSnap.exists()) {
+        let orderData = { id: orderSnap.id, ...orderSnap.data() };
+        console.log("Order data fetched:", orderData);
         
-        if (orderSnap.exists()) {
-          setOrder({ id: orderSnap.id, ...orderSnap.data() });
-        } else {
-          setError("Order not found");
+        // If the order has a userId reference, fetch that user's data
+        if (orderData.userId) {
+          console.log("Found userId in order:", orderData.userId);
+          try {
+            const userRef = doc(db, "users", orderData.userId);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+              console.log("User data fetched:", userData);
+              setUserData(userData);
+              
+              // Check ALL possible field name variations
+              // Directly update order data with user information if missing
+              if (!orderData.customerName) {
+                // Check all possible name field variations
+                orderData.customerName = 
+                  userData.fullName || 
+                  userData.displayName || 
+                  userData.name || 
+                  "Name not found in database";
+                console.log("Setting customer name to:", orderData.customerName);
+              }
+              
+              if (!orderData.customerPhone) {
+                // Check all possible phone field variations
+                orderData.customerPhone = 
+                  userData.phone || 
+                  userData.phoneNumber || 
+                  userData.customerPhone || 
+                  "Phone not found in database";
+                console.log("Setting customer phone to:", orderData.customerPhone);
+              }
+              
+              if (!orderData.deliveryAddress) {
+                // Check all possible address field variations
+                orderData.deliveryAddress = 
+                  userData.address || 
+                  userData.deliveryAddress || 
+                  userData.location || 
+                  "Address not found in database";
+                console.log("Setting delivery address to:", orderData.deliveryAddress);
+              }
+            } else {
+              console.log("User document doesn't exist for ID:", orderData.userId);
+            }
+          } catch (userErr) {
+            console.error("Error fetching user data:", userErr);
+          }
+        } else if (userProfile) {
+          console.log("No userId in order, using current userProfile");
+          
+          // If no userId but we have userProfile, use that
+          if (!orderData.customerName) {
+            orderData.customerName = 
+              userProfile.fullName || 
+              userProfile.displayName || 
+              userProfile.name || 
+              "Name not found in profile";
+            console.log("Setting customer name from profile:", orderData.customerName);
+          }
+          
+          if (!orderData.customerPhone) {
+            orderData.customerPhone = 
+              userProfile.phone || 
+              userProfile.phoneNumber || 
+              userProfile.customerPhone || 
+              "Phone not found in profile";
+            console.log("Setting customer phone from profile:", orderData.customerPhone);
+          }
+          
+          if (!orderData.deliveryAddress) {
+            orderData.deliveryAddress = 
+              userProfile.address || 
+              userProfile.deliveryAddress || 
+              userProfile.location || 
+              "Address not found in profile";
+            console.log("Setting delivery address from profile:", orderData.deliveryAddress);
+          }
         }
-      } catch (err) {
-        console.error("Error fetching order details:", err);
-        setError("Failed to load order details");
-      } finally {
-        setLoading(false);
+        
+        console.log("Final order data to be set:", orderData);
+        setOrder(orderData);
+      } else {
+        setError("Order not found");
       }
+    } catch (err) {
+      console.error("Error fetching order details:", err);
+      setError("Failed to load order details");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [orderId]);
+  if (orderId) {
+    fetchOrderDetails();
+  }
+}, [orderId, userProfile]);
 
   // Format date for display
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
-    
+
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
@@ -70,6 +167,34 @@ const PrflOrdrDetails = () => {
     }
   };
 
+  // Get user data (either from order, fetched user data, or current user profile)
+  const getCustomerName = () => {
+    console.log("Getting customer name:", {
+      orderName: order?.customerName,
+      userData: userData?.fullName,
+      userProfile: userProfile?.fullName,
+    });
+
+    if (order?.customerName) return order.customerName;
+    if (userData?.fullName) return userData.fullName;
+    if (userProfile?.fullName) return userProfile.fullName;
+    return "Not provided";
+  };
+
+  const getCustomerPhone = () => {
+    if (order?.customerPhone) return order.customerPhone;
+    if (userData?.phone) return userData.phone;
+    if (userProfile?.phone) return userProfile.phone;
+    return "Not provided";
+  };
+
+  const getDeliveryAddress = () => {
+    if (order?.deliveryAddress) return order.deliveryAddress;
+    if (userData?.address) return userData.address;
+    if (userProfile?.address) return userProfile.address;
+    return "Not provided";
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 pt-16">
@@ -87,7 +212,7 @@ const PrflOrdrDetails = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <div className="text-red-500 text-xl mb-4">Error: {error}</div>
-            <button 
+            <button
               onClick={() => navigate("/profile")}
               className="inline-flex items-center px-4 py-2 bg-brightColor hover:bg-orange-500 text-white rounded-md"
             >
@@ -105,7 +230,7 @@ const PrflOrdrDetails = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <div className="text-gray-500 text-xl mb-4">Order not found</div>
-            <button 
+            <button
               onClick={() => navigate("/profile")}
               className="inline-flex items-center px-4 py-2 bg-brightColor hover:bg-orange-500 text-white rounded-md"
             >
@@ -125,7 +250,7 @@ const PrflOrdrDetails = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <button 
+          <button
             onClick={() => navigate("/profile")}
             className="inline-flex items-center mb-6 text-brightColor hover:text-orange-500"
           >
@@ -142,12 +267,16 @@ const PrflOrdrDetails = () => {
                   </h1>
                   <div className="flex items-center mt-2">
                     <FaClock className="text-gray-400 mr-2" />
-                    <span className="text-gray-500">{formatDate(order.createdAt)}</span>
+                    <span className="text-gray-500">
+                      {formatDate(order.createdAt)}
+                    </span>
                   </div>
                 </div>
                 <div className="mt-2 md:mt-0">
                   <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                      order.status
+                    )}`}
                   >
                     {order.status || "Processing"}
                   </span>
@@ -157,54 +286,90 @@ const PrflOrdrDetails = () => {
 
             {/* Order Summary */}
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Order Summary</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Order Summary
+              </h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                      <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                      <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                      <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Item
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Quantity
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Price
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Total
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {order.items && order.items.map((item, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {item.img && (
-                              <div className="flex-shrink-0 h-10 w-10 mr-3">
-                                <img className="h-10 w-10 rounded-full object-cover" src={item.img} alt={item.name} />
-                              </div>
-                            )}
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                              {item.size && <div className="text-xs text-gray-500">Size: {item.size}</div>}
-                              {item.extras && item.extras.length > 0 && (
-                                <div className="text-xs text-gray-500">
-                                  Extras: {item.extras.join(", ")}
+                    {order.items &&
+                      order.items.map((item, index) => (
+                        <tr key={index}>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              {item.img && (
+                                <div className="flex-shrink-0 h-10 w-10 mr-3">
+                                  <img
+                                    className="h-10 w-10 rounded-full object-cover"
+                                    src={item.img}
+                                    alt={item.name}
+                                  />
                                 </div>
                               )}
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {item.name}
+                                </div>
+                                {item.size && (
+                                  <div className="text-xs text-gray-500">
+                                    Size: {item.size}
+                                  </div>
+                                )}
+                                {item.extras && item.extras.length > 0 && (
+                                  <div className="text-xs text-gray-500">
+                                    Extras: {item.extras.join(", ")}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                          {item.quantity}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                          ${item.price.toFixed(2)}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                            {item.quantity}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                            ${item.price.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                   <tfoot className="bg-gray-50">
                     {order.deliveryFee && (
                       <tr>
-                        <td colSpan="3" className="px-4 py-3 text-sm font-medium text-gray-900 text-right">
+                        <td
+                          colSpan="3"
+                          className="px-4 py-3 text-sm font-medium text-gray-900 text-right"
+                        >
                           Delivery Fee
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900 text-right">
@@ -214,7 +379,10 @@ const PrflOrdrDetails = () => {
                     )}
                     {order.tax && (
                       <tr>
-                        <td colSpan="3" className="px-4 py-3 text-sm font-medium text-gray-900 text-right">
+                        <td
+                          colSpan="3"
+                          className="px-4 py-3 text-sm font-medium text-gray-900 text-right"
+                        >
                           Tax
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900 text-right">
@@ -223,7 +391,10 @@ const PrflOrdrDetails = () => {
                       </tr>
                     )}
                     <tr>
-                      <td colSpan="3" className="px-4 py-3 text-base font-bold text-gray-900 text-right">
+                      <td
+                        colSpan="3"
+                        className="px-4 py-3 text-base font-bold text-gray-900 text-right"
+                      >
                         Total
                       </td>
                       <td className="px-4 py-3 text-base font-bold text-gray-900 text-right">
@@ -237,41 +408,53 @@ const PrflOrdrDetails = () => {
 
             {/* Delivery Information */}
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Delivery Information</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Delivery Information
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-start mb-3">
                     <FaUser className="text-gray-400 mr-3 mt-1" />
                     <div>
                       <p className="text-xs text-gray-500">Customer Name</p>
-                      <p className="font-medium text-gray-900">{order.customerName || "Not provided"}</p>
+                      <p className="font-medium text-gray-900">
+                        {getCustomerName()}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start mb-3">
                     <FaPhone className="text-gray-400 mr-3 mt-1" />
                     <div>
                       <p className="text-xs text-gray-500">Phone Number</p>
-                      <p className="font-medium text-gray-900">{order.customerPhone || "Not provided"}</p>
+                      <p className="font-medium text-gray-900">
+                        {getCustomerPhone()}
+                      </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <div className="flex items-start mb-3">
                     <FaMapMarkerAlt className="text-gray-400 mr-3 mt-1" />
                     <div>
                       <p className="text-xs text-gray-500">Delivery Address</p>
-                      <p className="font-medium text-gray-900">{order.deliveryAddress || "Not provided"}</p>
+                      <p className="font-medium text-gray-900">
+                        {getDeliveryAddress()}
+                      </p>
                     </div>
                   </div>
-                  
+
                   {order.deliveryInstructions && (
                     <div className="flex items-start">
                       <div className="text-gray-400 mr-3">📝</div>
                       <div>
-                        <p className="text-xs text-gray-500">Delivery Instructions</p>
-                        <p className="font-medium text-gray-900">{order.deliveryInstructions}</p>
+                        <p className="text-xs text-gray-500">
+                          Delivery Instructions
+                        </p>
+                        <p className="font-medium text-gray-900">
+                          {order.deliveryInstructions}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -281,13 +464,17 @@ const PrflOrdrDetails = () => {
 
             {/* Payment Information */}
             <div className="p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Payment Information</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Payment Information
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <p className="text-xs text-gray-500">Payment Method</p>
-                  <p className="font-medium text-gray-900">{order.paymentMethod || "Cash On Delivery"}</p>
+                  <p className="font-medium text-gray-900">
+                    {order.paymentMethod || "Cash On Delivery"}
+                  </p>
                 </div>
-                
+
                 <div>
                   <p className="text-xs text-gray-500">Payment Status</p>
                   <p className="font-medium text-gray-900">
