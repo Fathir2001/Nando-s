@@ -101,6 +101,10 @@ const Profile = () => {
     loadUserData();
   }, [currentUser, navigate, userProfile, fetchUserProfile]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;

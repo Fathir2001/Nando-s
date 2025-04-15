@@ -68,6 +68,10 @@ const AddToCart = () => {
     setSubtotal(total);
   }, [cartItems]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Remove item from cart
   const removeItem = async (id) => {
     try {
