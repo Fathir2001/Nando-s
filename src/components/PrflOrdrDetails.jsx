@@ -85,6 +85,22 @@ const PrflOrdrDetails = () => {
     }
   }, [orderId, userProfile, currentUser]);
 
+  useEffect(() => {
+    if (order && order.items && order.items.length > 0) {
+      console.log("Item structure check:", {
+        firstItem: order.items[0],
+        hasNameProperty: "name" in order.items[0],
+        itemKeys: Object.keys(order.items[0]),
+        possibleNameFields: {
+          name: order.items[0].name,
+          title: order.items[0].title,
+          productName: order.items[0].productName,
+          itemName: order.items[0].itemName,
+        },
+      });
+    }
+  }, [order]);
+
   // Format date for display
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
@@ -331,20 +347,29 @@ const PrflOrdrDetails = () => {
                     {order.items &&
                       order.items.map((item, index) => (
                         <tr key={index}>
-                          <td className="px-4 py-4 whitespace-nowrap">
+                          <td className="px-4 py-4">
                             <div className="flex items-center">
                               {item.img && (
                                 <div className="flex-shrink-0 h-10 w-10 mr-3">
                                   <img
                                     className="h-10 w-10 rounded-full object-cover"
                                     src={item.img}
-                                    alt={item.name}
+                                    alt={item.name || "Food item"}
                                   />
                                 </div>
                               )}
                               <div>
                                 <div className="text-sm font-medium text-gray-900">
-                                  {item.name}
+                                  {item.name ||
+                                    item.title ||
+                                    item.productName ||
+                                    item.itemName ||
+                                    (item.product &&
+                                      (item.product.name ||
+                                        item.product.title)) ||
+                                    JSON.stringify(item).substring(0, 20) +
+                                      "..." ||
+                                    "Unnamed item"}
                                 </div>
                                 {item.size && (
                                   <div className="text-xs text-gray-500">
