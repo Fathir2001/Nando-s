@@ -6,7 +6,7 @@ A fully functional restaurant web application for **Nando's**, built with React,
 
 ## 🌐 Live Demo
 
-**[https://nandos-restaurant.netlify.app](https://nandos-restaurant.netlify.app)**
+**[https://poetic-kitten-7661d3.netlify.app](https://poetic-kitten-7661d3.netlify.app)**
 
 ---
 
@@ -29,17 +29,20 @@ A fully functional restaurant web application for **Nando's**, built with React,
 ## ✨ Features
 
 ### 🧑‍💼 Authentication
+
 - User **registration** with full name, email, phone, and address
 - **Login** and **logout** with Firebase Authentication
 - **Forgot password** via email reset link
 - **Protected routes** — cart and order pages require authentication
 
 ### 🍽️ Menu & Browsing
+
 - Browse menu across multiple categories: **Dishes**, **Desserts**, **Fresh Juices**, and **Shakes**
 - Smooth scroll navigation between sections
 - Animated menu cards with hover effects
 
 ### 🛒 Shopping Cart
+
 - **Add to cart** from any menu category
 - Adjust **item quantities** directly in the cart
 - **Remove items** individually
@@ -47,6 +50,7 @@ A fully functional restaurant web application for **Nando's**, built with React,
 - Cart state persisted in **Cloud Firestore** per user
 
 ### 📦 Order Management
+
 - Place orders directly from the cart
 - Order confirmation **dialog** before placing
 - **Email notification** sent to the restaurant on every new order (with customer info and itemized order details)
@@ -54,16 +58,19 @@ A fully functional restaurant web application for **Nando's**, built with React,
 - Each order tracks status: **Pending → Processing → Delivered / Cancelled**
 
 ### 📧 Email-Based Order Status Updates
+
 - Restaurant receives an email with **one-click action links**
 - Admin can update order status (Processing / Delivered / Cancelled) directly from the email without logging in
 - Status changes are securely validated with a **token-based system**
 
 ### 👤 User Profile
+
 - View and **edit profile** (display name, phone, address)
 - View **order history** with order details and current status
 - Navigate to individual order detail pages
 
 ### 🎨 UI / UX
+
 - Fully **responsive** design (mobile-first with Tailwind CSS)
 - Smooth **page animations** powered by Framer Motion
 - **Toast notifications** for actions (add to cart, order placed, errors)
@@ -74,22 +81,22 @@ A fully functional restaurant web application for **Nando's**, built with React,
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose | Why Used |
-|---|---|---|
-| **React 18** | Frontend UI library | Component-based architecture enables modular, reusable UI; hooks (useState, useEffect, useContext) simplify state management |
-| **Vite** | Build tool & dev server | Extremely fast HMR and build times compared to Create React App; native ES module support |
-| **Tailwind CSS** | Utility-first CSS framework | Rapid UI development with utility classes; eliminates writing custom CSS; easy responsive design |
-| **Firebase Auth** | User authentication | Handles secure auth flows (sign-up, login, password reset) out of the box with no backend needed |
-| **Cloud Firestore** | NoSQL cloud database | Real-time, scalable database for storing users, cart items, and orders; seamless Firebase integration |
-| **Firebase Analytics** | Usage analytics | Tracks page views and user interactions to understand app usage |
-| **Framer Motion** | Animation library | Declarative animations for page transitions, card reveals, and micro-interactions with minimal code |
-| **React Router DOM v7** | Client-side routing | Handles multi-page navigation (SPA); supports protected routes and nested layouts |
-| **React Toastify** | Toast notifications | Lightweight, customizable notification system for user feedback on actions |
-| **React Icons** | Icon library | Massive collection of icons (FontAwesome, Bootstrap, etc.) as React components |
-| **React Scroll** | Smooth scroll | Enables smooth scrolling to named sections without custom JS |
-| **Nodemailer** | Email sending (server-side) | Sends order confirmation emails via Gmail SMTP from Netlify serverless functions |
-| **Netlify Functions** | Serverless backend | Runs server-side logic (email sending, order status updates) without maintaining a dedicated backend server |
-| **Netlify** | Deployment & hosting | Git-based continuous deployment, CDN hosting, and built-in support for serverless functions |
+| Technology              | Purpose                     | Why Used                                                                                                                     |
+| ----------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **React 18**            | Frontend UI library         | Component-based architecture enables modular, reusable UI; hooks (useState, useEffect, useContext) simplify state management |
+| **Vite**                | Build tool & dev server     | Extremely fast HMR and build times compared to Create React App; native ES module support                                    |
+| **Tailwind CSS**        | Utility-first CSS framework | Rapid UI development with utility classes; eliminates writing custom CSS; easy responsive design                             |
+| **Firebase Auth**       | User authentication         | Handles secure auth flows (sign-up, login, password reset) out of the box with no backend needed                             |
+| **Cloud Firestore**     | NoSQL cloud database        | Real-time, scalable database for storing users, cart items, and orders; seamless Firebase integration                        |
+| **Firebase Analytics**  | Usage analytics             | Tracks page views and user interactions to understand app usage                                                              |
+| **Framer Motion**       | Animation library           | Declarative animations for page transitions, card reveals, and micro-interactions with minimal code                          |
+| **React Router DOM v7** | Client-side routing         | Handles multi-page navigation (SPA); supports protected routes and nested layouts                                            |
+| **React Toastify**      | Toast notifications         | Lightweight, customizable notification system for user feedback on actions                                                   |
+| **React Icons**         | Icon library                | Massive collection of icons (FontAwesome, Bootstrap, etc.) as React components                                               |
+| **React Scroll**        | Smooth scroll               | Enables smooth scrolling to named sections without custom JS                                                                 |
+| **Nodemailer**          | Email sending (server-side) | Sends order confirmation emails via Gmail SMTP from Netlify serverless functions                                             |
+| **Netlify Functions**   | Serverless backend          | Runs server-side logic (email sending, order status updates) without maintaining a dedicated backend server                  |
+| **Netlify**             | Deployment & hosting        | Git-based continuous deployment, CDN hosting, and built-in support for serverless functions                                  |
 
 ---
 
@@ -211,7 +218,7 @@ VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 EMAIL_USER=your_gmail_address@gmail.com
 EMAIL_PASS=your_gmail_app_password
 ORDER_SECRET_KEY=your_custom_secret_key
-URL=https://your-site.netlify.app
+URL=https://poetic-kitten-7661d3.netlify.app
 ```
 
 > **Note:** For production, set `EMAIL_USER`, `EMAIL_PASS`, `ORDER_SECRET_KEY`, and `URL` as environment variables in the **Netlify dashboard** under Site Settings → Environment variables.
@@ -223,10 +230,12 @@ URL=https://your-site.netlify.app
 Located in `netlify/functions/`:
 
 ### `sendOrderEmail.js`
+
 - **Trigger:** Called from the frontend when a customer places an order
 - **Action:** Sends an HTML email to the restaurant with full order details and one-click status update links
 
 ### `updateOrderStatus.js`
+
 - **Trigger:** Restaurant clicks a status link in the order email
 - **Action:** Validates the token and updates the order status in Firestore (Processing / Delivered / Cancelled)
 
@@ -280,12 +289,12 @@ service cloud.firestore {
 
 ## 📜 Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start Vite development server |
-| `npm run build` | Build for production |
+| Command           | Description                      |
+| ----------------- | -------------------------------- |
+| `npm run dev`     | Start Vite development server    |
+| `npm run build`   | Build for production             |
 | `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint on all JS/JSX files |
+| `npm run lint`    | Run ESLint on all JS/JSX files   |
 
 ---
 
